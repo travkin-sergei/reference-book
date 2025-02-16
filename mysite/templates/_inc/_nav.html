@@ -1,0 +1,161 @@
+<nav class="navbar navbar-expand-lg bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Home</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                       ariafexpanded="false">
+                        О нас
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'redoc' %}">ReDoc</a></li>
+                        <li><a class="dropdown-item" href="{% url 'swagger' %}">Swagger</a></li>
+                        <li><a class="dropdown-item" href="{% url 'admin:index' %}doc/">admin_doc</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#">
+                                О разделе
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                       aria-expanded="false">
+                        Сервисы
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="nav-link" href="#">Сервисы</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#">
+                                О разделе
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                       aria-expanded="false">
+                        Геообъекты
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'my_geo_id:geo-list' %}">
+                                Список объектов
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'my_geo_id:geo-map' %}">
+                                Группировки
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'my_geo_id:geo-code' %}">
+                                Справочники
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'my_geo_id:geo-name' %}">
+                                Синонимы
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'my_geo_id:geo-id-search' %}">
+                                Поиск GEO-ID по синонимам
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'my_data_asset:world_map' %}">
+                                Карта
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item" href="{% url 'my_geo_id:about-app' %}">
+                                О разделе
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button"
+                       data-bs-toggle="dropdown"
+                       aria-expanded="false">
+                        Источники данных
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'my_data_asset:data-asset' %}">
+                                Источники данных
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'my_data_asset:data-asset-groups' %}">
+                                Группы источников данных
+                            </a>
+                        </li>
+
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'my_data_asset:about-app' %}">
+                                О разделе
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle"
+                       href="#"
+                       role="button"
+                       data-bs-toggle="dropdown"
+                       aria-expanded="false">
+                        Пользователи
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Пользователи</a>
+                        </li>
+
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#">
+                                О разделе
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="navbar-brand">
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <form method="post" action="#" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit"
+                                data-mdb-button-init data-mdb-ripple-init
+                                class="btn btn-primary btn-lg">
+                            Logout
+                        </button>
+                    </form>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="#">login</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

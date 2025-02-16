@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock title %}
+{% block body %}
+<div class="container-fluid">
+    <form method="GET">
+        <div class="container">
+            <div class="row">
+                <h1>Детали геообъекта: {{ geo_name.object_name }}</h1>
+                <h3>Уникальный код: <code>{{ geo_name.object_code }}</code></h3>
+                <h2>Варианты названий:</h2>
+                <ul>
+                    {% for geo_name in geo_name_detail %}
+                    <li>{{ geo_name.language }} {{ geo_name.name }} </li>
+                    {% empty %}
+                    <li>Нет доступных названий.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

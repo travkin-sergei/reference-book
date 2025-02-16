@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock title %}
+{% block body %}
+
+<div class="container my-5" style="font-size: 1.2em;">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary">Описание веб-приложения GEO-ID</h1>
+        <p class="lead text-muted">Унификация географических названий и маппинг кодов</p>
+    </div>
+
+    <div class="card shadow-sm mb-5">
+        <div class="card-body">
+            <h2 class="card-title text-primary">Цель приложения</h2>
+            <p class="card-text">
+                GEO-ID — это веб-приложение, предназначенное для унификации названий географических мест (стран, регионов,
+                городов и других административных единиц), а также для маппинга кодов из различных международных и
+                национальных систем классификации. Приложение позволяет хранить и управлять информацией о названиях на
+                разных языках мира, обеспечивая согласованность и точность данных в различных системах.
+            </p>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-5">
+        <div class="card-body">
+            <h2 class="card-title text-primary">Основные функции</h2>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <strong>Унификация географических названий:</strong>
+                    <ul>
+                        <li>Централизованная база данных с актуальными названиями стран, регионов, городов и других
+                            географических объектов.
+                        </li>
+                        <li>Поддержка альтернативных и исторических названий.</li>
+                        <li>Возможность добавления и редактирования названий администраторами системы.</li>
+                    </ul>
+                </li>
+                <li class="list-group-item">
+                    <strong>Маппинг кодов:</strong>
+                    <ul>
+                        <li>Возможность сопоставления кодов из разных систем для одного и того же географического объекта.</li>
+                    </ul>
+                </li>
+                <li class="list-group-item">
+                    <strong>Многоязычная поддержка:</strong>
+                    <ul>
+                        <li>Хранение названий географических объектов на разных языках мира.</li>
+                        <li>Поддержка транслитерации и перевода названий.</li>
+                        <li>Возможность добавления новых языков и редактирования существующих переводов.</li>
+                    </ul>
+                </li>
+                <li class="list-group-item">
+                    <strong>API для интеграции:</strong>
+                    <ul>
+                        <li>Возможность получения данных в форматах JSON.</li>
+                    </ul>
+                </li>
+                <li class="list-group-item">
+                    <strong>Управление данными:</strong>
+                    <ul>
+                        <li>Инструменты для добавления, редактирования и удаления данных.</li>
+                        <li>Ведение журнала изменений для отслеживания истории обновлений.</li>
+                        <li>Возможность загрузки данных из внешних источников (например, открытых баз данных GeoNames).</li>
+                    </ul>
+                </li>
+                <li class="list-group-item">
+                    <strong>Пользовательские роли и доступ:</strong>
+                    <ul>
+                        <li>Разграничение прав доступа для администраторов, редакторов и пользователей.</li>
+                        <li>Возможность настройки ролей и разрешений.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-5">
+        <div class="card-body">
+            <h2 class="card-title text-primary">Преимущества приложения</h2>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Упрощение процесса унификации географических данных в различных системах.</li>
+                <li class="list-group-item">Снижение ошибок, связанных с несоответствием названий и кодов.</li>
+                <li class="list-group-item">Поддержка многоязычности, что особенно важно для международных проектов.</li>
+                <li class="list-group-item">Гибкость и масштабируемость благодаря API и поддержке различных форматов данных.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-5">
+        <div class="card-body">
+            <h2 class="card-title text-primary">Целевая аудитория</h2>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Компании, работающие с международными данными (логистика, туризм, финансы, ритейл).</li>
+                <li class="list-group-item">Государственные организации, занимающиеся статистикой и административным управлением.</li>
+                <li class="list-group-item">Разработчики программного обеспечения, которым требуется точная географическая информация.</li>
+                <li class="list-group-item">Исследователи и аналитики, работающие с географическими данными.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-5">
+        <div class="card-body">
+            <h2 class="card-title text-primary">Технологии</h2>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong>Бэкенд:</strong> Python (Django)</li>
+                <li class="list-group-item"><strong>База данных:</strong> PostgreSQL</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-5">
+        <div class="card-body">
+            <h2 class="card-title text-primary">Заключение</h2>
+            <p class="card-text">
+                GEO-ID — это мощный инструмент для управления географическими данными, который помогает организациям
+                избежать путаницы с названиями и кодами, обеспечивая точность и согласованность информации. Приложение
+                подходит для использования в различных отраслях и легко интегрируется с существующими системами.
+            </p>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-5">
+        <div class="card-body">
+            <h2 class="card-title text-primary">Полезные ссылки</h2>
+            <p class="card-text">
+                <a href="https://www.mid.ru/ru/maps/" class="btn btn-primary">Карта мира от МИД России</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

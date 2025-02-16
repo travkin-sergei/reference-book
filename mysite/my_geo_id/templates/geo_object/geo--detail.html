@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}{{ geo_objects_detail.object_name }}{% endblock title %}
+{% block body %}
+<div class="container">
+    <h1 class="mt-4">{{ geo_objects_detail.object_name }}</h1>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Основная информация</h5>
+            <p class="card-text">
+                <strong>Уникальный код:</strong>
+                {{ geo_objects_detail.object_code }}
+            </p>
+            <p class="card-text">
+                <strong>Дата начала действия:</strong>
+                {{ geo_objects_detail.date_start|default:"" }}
+            </p>
+            <p class="card-text">
+                <strong>Дата прекращения действия:</strong>
+                {{ geo_objects_detail.date_stop|default:"" }}
+            </p>
+        </div>
+    </div>
+
+    <h2 class="mt-4">Варианты названий:</h2>
+    <ul class="list-group mb-4">
+        {% for geo_name in geo_names %}
+        <li class="list-group-item">{{ geo_name.name }}</li>
+        {% empty %}
+        <li class="list-group-item">Нет доступных названий.</li>
+        {% endfor %}
+    </ul>
+
+    <h2 class="mt-4">Дополнительная информация:</h2>
+    <div class="card mb-4">
+        <div class="card-body">
+            {% if geo_info %}
+            <p class="card-text"><strong>Площадь территории:</strong> {{ geo_info.area }} кв. км</p>
+            <p class="card-text"><strong>Координаты:</strong> {{ geo_info.coordinates }}</p>
+            {% else %}
+            <p class="card-text">Дополнительная информация отсутствует.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

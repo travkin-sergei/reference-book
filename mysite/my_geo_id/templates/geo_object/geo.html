@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock title %}
+{% block body %}
+<div class="container-fluid">
+    <form method="GET">
+        <div class="container">
+            <div class="row">
+                <h1>Список геообъектов:</h1>
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th scope="col">
+                            <label for="id_object_code">Основной объект</label><br>
+                            {{ filter.form.object_code }}
+                        </th>
+                        <th scope="col">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <label for="id_object_name">Тип кода</label><br>
+                                    {{ filter.form.object_name }}  <!-- Форма ввода под лейблом -->
+                                </div>
+                                <div class="ms-auto">  <!-- Класс ms-auto для выравнивания кнопки вправо -->
+                                    <button type="submit" class="btn btn-primary">Поиск</button>
+                                </div>
+                            </div>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for i_object in geo_objects %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'my_geo_id:geo-detail' i_object.object_code %}">
+                                {{ i_object.object_code }}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{% url 'my_geo_id:geo-detail' i_object.object_code %}">
+                                {{ i_object.object_name }}
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

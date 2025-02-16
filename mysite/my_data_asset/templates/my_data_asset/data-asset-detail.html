@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock title %}
+{% block body %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <h2>ID: {{ data_asset_detail.uir|default:"" }}</h2>
+            <h2>{{ data_asset_detail.name|default:"" }}</h2>
+            <p><strong>Последнее обновление карточки:</strong>
+                {{ data_asset_detail.last_update|default:"" }}
+            </p>
+            <p><strong>Тип:</strong> {{ data_asset_detail.type|default:"" }}</p>
+            <p><strong>Статус:</strong> {{ data_asset_detail.status|default:"" }}</p>
+            <p><strong>Описание:</strong> {{ data_asset_detail.comment|safe|default:"" }}</p>
+            <p><strong>Версия:</strong> {{ data_asset_detail.version|default:"" }}</p>
+            {% if user.is_superuser %}
+            <p><strong>Хост:</strong> {{ data_asset_detail.host|default:"" }}</p>
+            <p><strong>Порт:</strong> {{ data_asset_detail.port|default:"" }}</p>
+            {% endif %}
+        </div>
+        <div class="col-md-8">
+            <h3>
+                <a href="{% url 'my_data_asset:data-model' %}" class="btn btn-secondary">Полный список.</a>
+                Связанные модели данных
+            </h3>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Название модели</th>
+                    <th>Комментарий</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for data_model in page_obj %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>
+                        <a href="{% url 'my_data_asset:data-model-detail' data_model.id %}">
+                            {{ data_model.name }}
+                        </a>
+                    </td>
+                    <td>{{ data_model.comment|truncatechars:50|safe }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">Нет связанных моделей данных.</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
