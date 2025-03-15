@@ -6,13 +6,13 @@
 
 {% block body %}
 <div class="container">
-    <h1>{{ data_model.title }}</h1>  <!-- Заголовок модели -->
+    <h1>{{ data_model.title }}</h1>
 
     <div class="data-table">
         <h2>Детали</h2>
         <ul>
             <li><strong>ID:</strong> {{ data_model.id }}</li>
-            <li><strong>Описание:</strong> {{ data_model.description }}</li>
+            <li><strong>Описание:</strong> {{ data_model.description|safe }}</li>
             <li><strong>Дата создания:</strong> {{ data_model.created_at }}</li>
             <li><strong>Дата обновления:</strong> {{ data_model.updated_at }}</li>
         </ul>

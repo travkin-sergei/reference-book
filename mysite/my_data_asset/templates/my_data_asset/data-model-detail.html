@@ -33,7 +33,7 @@
                             {{ related_model.name|default:"" }}
                         </a>
                     </td>
-                    <td>{{ related_model.comment|default:"" }}</td>
+                    <td>{{ related_model.comment|safe|default:"" }}</td>
                 </tr>
                 {% empty %}
                 <tr>

@@ -28,12 +28,12 @@
                     <tr>
                         <td>
                             <a href="{% url 'my_geo_id:geo-map-detail' pk=i_object.pk %}">
-                                {{ i_object.main.object_name }}
+                                {{ i_object.main.object_code }}
                             </a>
                         </td>
                         <td>
                             <a href="{% url 'my_geo_id:geo-map-detail' pk=i_object.pk %}">
-                                {{ i_object.code_type }}
+                                {{ i_object.main.object_name }}
                             </a>
                         </td>
                     </tr>

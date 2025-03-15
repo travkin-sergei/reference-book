@@ -100,8 +100,6 @@ class GeoInfoInline(admin.TabularInline):
         return formset
 
 
-
-
 @admin.register(GeoObject)
 class GeoObjectAdmin(BaseAdmin):
     """Админка для списка уникальных геообъектов."""
@@ -109,7 +107,7 @@ class GeoObjectAdmin(BaseAdmin):
     inlines = [GeoInfoInline]
 
     readonly_fields = 'user', 'object_code',
-    list_display = 'object_code', 'object_name', 'user', 'task',
+    list_display = 'object_code', 'is_active', 'object_name', 'user', 'task',
     list_display_links = 'object_code', 'object_name', 'user', 'task',
     search_fields = 'object_code', 'object_name', 'task',
 
@@ -118,7 +116,8 @@ class GeoObjectAdmin(BaseAdmin):
 
     def get_queryset(self, request):
         """Отображение связанных в модели многие ко многим."""
-        return GeoObject.objects.filter(is_active=True).prefetch_related("geo_name").all()
+        result = GeoObject.objects.prefetch_related("geo_name").all()
+        return result
 
     def save_model(self, request, obj, form, change):
         """Сохранение автора записи и генерация уникального кода."""
@@ -155,10 +154,11 @@ class GeoObjectCodeSubInline(admin.TabularInline):
 
     model = GeoObjectCodeSub
     extra = 1
-    autocomplete_fields = 'geo_object',
+    autocomplete_fields = 'geo_object', 'name',
     exclude = 'user',
 
 
+# 03.01 Справочник
 @admin.register(GeoObjectCode)
 class GeoObjectCodeAdmin(BaseAdmin):
     """Админка для GeoObjectCode."""
@@ -176,7 +176,7 @@ class GeoObjectCodeAdmin(BaseAdmin):
         for instance in instances:
             # Убедитесь, что поле user не используется, если его нет в модели
             instance.save()
-        formset.save_m2m()# Сохраняем связи many-to-many, если они есть
+        formset.save_m2m()  # Сохраняем связи many-to-many, если они есть
 
 
 class GeoObjectMapInline(admin.TabularInline):
@@ -197,3 +197,12 @@ class GeoObjectMapAdmin(BaseAdmin):
     list_display_links = 'main',
     search_fields = 'main__object_name', 'sub_objects__code_type__map_type',
     autocomplete_fields = 'main',
+
+    def get_search_results(self, request, queryset, search_term):
+        """Фильтруем результаты поиска для поля main."""
+        queryset, use_distinct = super().get_search_results(request, queryset, search_term)
+
+        # Фильтруем только те объекты, у которых is_active = True
+        queryset = queryset.filter(main__is_active=True)
+
+        return queryset, use_distinct

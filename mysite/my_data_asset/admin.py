@@ -1,11 +1,12 @@
 from django.contrib import admin
 
+
 from .models import (
     DataAsset, DataAssetType, DataAssetStatus,
     DataModel,
     DataTable,
     DataValue,
-    DataAssetGroup, DataModelGroup, DataTableGroup, DataValueGroup, DataAssetGroupAsset,
+    DataAssetGroup, DataAssetGroupAsset,
 )
 
 

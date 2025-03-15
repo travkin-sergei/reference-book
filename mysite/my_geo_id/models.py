@@ -10,6 +10,7 @@ from django.db.models import DateField
 
 def generate_unique_code(length=6):
     """Генерация набора из чисел и букв в нижнем регистре, с запретом на полностью числовые значения."""
+
     characters = string.ascii_lowercase + string.digits
     while True:
         # Генерируем случайный код заданной длины
@@ -252,6 +253,7 @@ class GeoObjectCodeSub(models.Model):
 
     geo_object_code = models.ForeignKey(GeoObjectCode, on_delete=models.CASCADE, related_name='sub_objects')
     geo_object = models.ForeignKey(GeoObject, on_delete=models.CASCADE)
+    name = models.ForeignKey(GeoNames, null=True, blank=True, on_delete=models.CASCADE)
     code_name = models.CharField(max_length=255)
     is_group = models.BooleanField(
         default=False
@@ -276,7 +278,7 @@ class GeoObjectCodeSub(models.Model):
 
 
 class GeoObjectMap(BaseModel):
-    """Варианты кодов геообъектов."""
+    """Группировки геообъектов."""
 
     main = models.ForeignKey('GeoObject', on_delete=models.CASCADE)
 
@@ -344,3 +346,19 @@ class GeoInfo(BaseModel):
         db_table = "geo_info"
         verbose_name = 'Площадь территории'
         verbose_name_plural = 'Площадь территории'
+
+
+class MapLocation(models.Model):
+    """
+    Названия
+    Координаты
+    Картинка
+    """
+
+    name = models.CharField(max_length=255)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    image = models.ImageField(upload_to='maps/')
+
+    def __str__(self):
+        return self.name

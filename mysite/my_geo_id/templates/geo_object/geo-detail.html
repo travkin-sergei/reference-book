@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block title %}{{ geo_objects_detail.object_name }}{% endblock title %}
+{% block head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<style>
+    #map {
+        width: 100%;
+        height: 400px;
+        background: #e0e0e0;
+    }
+    #coordinates {
+        text-align: center;
+        font-size: 16px;
+        margin-top: 10px;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <h1 class="mt-4">{{ geo_objects_detail.object_name }}</h1>
+            <div class="card mb-2">
+                <div class="card-body">
+                    <h5 class="card-title">Основная информация</h5>
+                    <p class="card-text"><strong>Уникальный код:</strong> {{ geo_objects_detail.object_code }}</p>
+                    <p class="card-text"><strong>Дата основания:</strong> {{ geo_objects_detail.date_start|default:"" }}
+                    </p>
+                    <p class="card-text"><strong>Дата ликвидации:</strong> {{ geo_objects_detail.date_stop|default:"" }}
+                    </p>
+                </div>
+            </div>
+            <h2 class="mt-4">Варианты названий:</h2>
+            <ul class="list-group mb-4">
+                {% for geo_name in geo_names %}
+                <li class="list-group-item">{{ geo_name.name }}</li>
+                {% empty %}
+                <li class="list-group-item">Нет доступных названий.</li>
+                {% endfor %}
+            </ul>
+            <h2 class="mt-4">Дополнительная информация:</h2>
+            <div class="card mb-4">
+                <div class="card-body">
+                    {% if geo_info %}
+                    <p class="card-text"><strong>Площадь территории:</strong>
+                        {{ geo_info.area|default:"Данных нет." }} кв. км
+                    </p>
+                    {% else %}
+                    <p class="card-text">Дополнительная информация отсутствует.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-2">
+                <div class="card-body">
+                    <div id="map"></div>
+                    <p id="coordinates">---</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+    var map = L.map('map', { zoomControl: false });
+
+    map.attributionControl.setPrefix(false);
+
+    var geojson = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": {
+                    "name": "{{ geo_objects_detail.object_name|default:'Неизвестно' }}",
+                    "color": "#007fff"
+                },
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                       {{ geo_info.coordinates }}
+                    ]
+                }
+            }
+        ]
+    };
+
+    var geoLayer = L.geoJSON(geojson, {
+        style: function (feature) {
+            return {
+                fillColor: feature.properties.color || "#FF0000",
+                weight: 2,
+                opacity: 1,
+                color: "black",
+                fillOpacity: 0.5
+            };
+        },
+        onEachFeature: function (feature, layer) {
+            layer.bindPopup(feature.properties.name);
+        }
+    }).addTo(map);
+
+    // Центрируем карту по границам полигона
+    var bounds = geoLayer.getBounds();
+    map.fitBounds(bounds);
+
+    // Уменьшаем уровень масштабирования
+    var currentZoom = map.getZoom(); // Получаем текущий уровень масштабирования
+    map.setZoom(currentZoom - 2); // Уменьшаем уровень масштабирования на 2
+
+    // Получаем центр полигона и отображаем его
+    var center = bounds.getCenter();
+    document.getElementById('coordinates').textContent =
+        center.lat.toFixed(6) + ", " + center.lng.toFixed(6);
+
+</script>
+{% endblock %}

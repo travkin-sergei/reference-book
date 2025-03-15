@@ -1,0 +1,41 @@
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" role="button" id="navbarDropdown" data-bs-toggle="dropdown"
+       aria-expanded="false">
+        Геообъекты
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+        <li>
+            <a class="dropdown-item" href="{% url 'my_geo_id:geo-list' %}">
+                Список объектов
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="{% url 'my_geo_id:geo-mapp' %}">
+                Группировки
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="{% url 'my_geo_id:geo-country-list' %}">
+                Справочники
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="{% url 'my_geo_id:geo-id-search' %}">
+                Поиск GEO-ID по синонимам
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="{% url 'my_geo_id:geo-map' %}">
+                Карта
+            </a>
+        </li>
+        <li>
+            <hr class="dropdown-divider">
+        </li>
+        <li>
+            <a class="dropdown-item" href="{% url 'my_geo_id:about-app' %}">
+                О разделе
+            </a>
+        </li>
+    </ul>
+</li>

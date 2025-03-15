@@ -7,13 +7,11 @@ from .views import (
     # представление в виде web-страницы
     GeoObjectView, GeoObjectCodeDetailView,
     GeoObjectMapView, GeoObjectMapDetailView,
-    GeoNamesView, GeoNamesDetailView,
     GeoNamesViewSet,
-    GeoObjectMapSubViewSet, GeoObjectSearchView, GetGeoIdForGeoNames, GeoInfoListView, GeoObjectDetailView,
+    GeoObjectMapSubViewSet, GeoObjectSearchView, GetGeoIdForGeoNames, GeoInfoListView, GeoObjectDetailView, index,
     # история
     # GeoObjectHistoryViewSet,
     # GeoObjectMapHistoryViewSet,
-
 )
 
 app_name = 'my_geo_id'
@@ -29,19 +27,19 @@ urlpatterns = [
     path('', AboutAppView.as_view(), name='about-app'),
     # Список названий
     path('geo-id-search/', GetGeoIdForGeoNames.as_view(), name='geo-id-search'),
-    path('geo-name/', GeoNamesView.as_view(), name='geo-name'),
-    path('geo-name/<str:pk>/', GeoNamesDetailView.as_view(), name='geo-name-detail'),
 
     # Список геообъектов
     path('geo/', GeoObjectView.as_view(), name="geo-list"),
     path('geo/<str:pk>', GeoObjectDetailView.as_view(), name="geo-detail"),
 
     # Группировки
-    path('geo-map/', GeoObjectMapView.as_view(), name="geo-map"),
+    path('geo-map/', GeoObjectMapView.as_view(), name="geo-mapp"),
     path('geo-map/<int:pk>/', GeoObjectMapDetailView.as_view(), name='geo-map-detail'),
     # Справочники
-    path('geo-code/', GeoObjectCodeView.as_view(), name='geo-code'),
-    path('geo-code/<int:pk>/', GeoObjectCodeDetailView.as_view(), name='geo-code-detail'),
+    path('geo-country-list/', GeoObjectCodeView.as_view(), name='geo-country-list'),
+    path('geo-country-list/<int:pk>/', GeoObjectCodeDetailView.as_view(), name='geo-country-list-detail'),
     # Тестировние карты.
     path('geo-code/map/', GeoInfoListView.as_view(), name='geo-code-detail'),
+    path('map/', index, name='geo-map'),
+
 ]

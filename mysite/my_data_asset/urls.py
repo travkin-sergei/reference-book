@@ -6,7 +6,7 @@ from .view.web import (
     DataAssetView, DataAssetDetailView,
     DataModelView, DataModelDetailView,
     DataTableView, DataTableDetailView,
-    DataAssetGroupsView, DataAssetGroupsDetailView, dependency_graph, custom_world_map,
+    DataAssetGroupsView, DataAssetGroupsDetailView,
 )
 
 app_name = 'my_data_asset'
@@ -32,9 +32,4 @@ urlpatterns = [
     # Группировка источников данных
     path('data-assets-groups/', DataAssetGroupsView.as_view(), name='data-asset-groups'),
     path('data-assets-groups/<int:pk>/', DataAssetGroupsDetailView.as_view(), name='data-asset-groups-detail'),
-
-    path('dependency-graph/', dependency_graph, name='dependency_graph'),
-    path('dependency-graph/<str:app_label>/', dependency_graph, name='dependency_graph'),
-    # Map
-    path('world-map/', custom_world_map, name='world_map'),
 ]

@@ -1,5 +1,5 @@
 from django.db import models
-from ckeditor.fields import RichTextField
+from django_ckeditor_5.fields import CKEditor5Field
 
 
 class SystemColumns(models.Model):
@@ -141,7 +141,7 @@ class DataAsset(BaseModel):
         , db_comment='{"name":"Название ресурса",}'
         , help_text="Название ресурса",
     )
-    comment = RichTextField(  # models.TextField
+    comment = CKEditor5Field(
         blank=True, null=True
         , verbose_name="Комментарий"
         , db_comment='{"name":"Описание ресурса",}'
@@ -187,7 +187,7 @@ class DataModel(BaseModel):
 
     data_asset = models.ForeignKey('DataAsset', on_delete=models.CASCADE, null=True, blank=True)  # Внешний ключ
     name = models.CharField(max_length=255, blank=True, null=True)  # Схема
-    comment = RichTextField(
+    comment = CKEditor5Field(
         help_text="Комментарий.",
         blank=True, null=True
     )
@@ -220,7 +220,7 @@ class DataTable(BaseModel):
     name = models.CharField(
         max_length=255, blank=True, null=True
     )  # Название таблицы данных
-    comment = RichTextField(
+    comment = CKEditor5Field(
         blank=True, null=True
         , help_text="Комментарий."
     )
@@ -276,7 +276,7 @@ class DataValue(BaseModel):
     class Meta:
         db_table = 'data_value'
         unique_together = [['data_table', 'name', ]]
-        ordering = ['-created_at']  # Сортировка по дате создания (по убыванию)
+        ordering = ['created_at']  # Сортировка по дате создания (по убыванию)
         verbose_name = '04 Значения таблицы'  # Указываем имя таблицы в админке
         verbose_name_plural = '04 Значения таблицы'  # Указываем имя таблицы в админке
 

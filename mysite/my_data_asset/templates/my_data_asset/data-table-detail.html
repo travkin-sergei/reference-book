@@ -10,7 +10,7 @@
         <div class="col-md-4">
             <h1>Детали таблицы данных</h1>
             <h2>{{ data_table_detail.name }}</h2>
-            <p><strong>Описание:</strong> {{ data_table_detail.comment }}</p>
+            <p><strong>Описание:</strong> {{ data_table_detail.comment|safe }}</p>
         </div>
     </div>
     <div class="row">

@@ -6,13 +6,12 @@
     <form method="GET">
         <div class="container">
             <div class="row">
-                <h1>{{ geo_object_map.main.object_name }} состоят из:</h1>
+                <h1>{{ geo_object_map }} состоит из:</h1>
                 <table class="table table-striped table-hover">
                     <thead>
                     <tr>
                         <th scope="col">#</th>
                         <th scope="col">geo-id</th>
-                        <th scope="col">{{ geo_object_map.code_type }}</th>
                         <th scope="col">description</th>
                     </tr>
                     </thead>
@@ -20,8 +19,11 @@
                     {% for sub in related_objects %}
                     <tr>
                         <td>{{ forloop.counter }}</td>
-                        <td>{{ sub.geo_object.object_code }}</td>
-                        <td>{{ sub.code_name }}</td>
+                        <td>
+                            <a href="{% url 'my_geo_id:geo-detail' pk=sub.geo_object.object_code%}">
+                                {{ sub.geo_object.object_code }}
+                            </a>
+                        </td>
                         <td>{{ sub.geo_object.object_name }}</td>
                     </tr>
                     {% empty %}

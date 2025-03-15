@@ -4,18 +4,22 @@
 
 1. Django==5.0.7 - основной фреймворк
 2. django-filter - фильтрация данных (выборка из базы)
-3. djangorestframework==3.15.2 
-4. drf-spectacular - документирвоание API 
+3. djangorestframework==3.15.2
+4. drf-spectacular - документирвоание API
 5. django-ckeditor - редактор текста
 
 ## Запуск:
+
 1. Создать виртуальное окружение
 2. запустить команду pip install -r requirements.txt
 3. сгенерировать свой SECRET_KEY
+
 ```commandline
 python3 -c "import secrets; print(secrets.token_urlsafe())"
 ```
+
 4. в корневой директории создать файл ".env"
+
 ```commandline
 SECRET_KEY=django-insecure-*************************************************
 DB_NAME=reference_book
@@ -26,7 +30,46 @@ DB_PORT=5432
 DB_SCHEMA=reference_book
 ```
 
-
 ## Список приложений:
 
-1. geo_object - это справочник гео объектов
+1. my_data_asset - это справочник источников данных
+2. my_geo_id - это справочник гео объектов
+
+## Структура проекта
+
+### Обязательные шаблоны (templates):
+
+1. about_application.html - Описание приложения!
+2. _nav.html - меню приложения:
+```html
+app_name - имя приложения.
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" role="button" id="navbarDropdown" data-bs-toggle="dropdown"
+       aria-expanded="false">
+        Геообъекты
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+        <li>
+            <a class="dropdown-item" href="{% url 'app_name:about-app' %}">
+                О разделе
+            </a>
+        </li>
+    </ul>
+</li>
+```
+
+templates/_inc/_nav.html в этот шаблон добавить 
+
+```html
+<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+    {% include 'app_name1/_nav.html' %}
+    {% include 'app_name2/_nav.html' %}
+    ...
+</ul>
+```
+    
+
+
+
+
+

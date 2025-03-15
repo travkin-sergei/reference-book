@@ -31,12 +31,12 @@
                     {% for i_object in geo_object_code %}
                     <tr>
                         <td>
-                            <a href="{% url 'my_geo_id:geo-code-detail' pk=i_object.pk %}">
+                            <a href="{% url 'my_geo_id:geo-country-list-detail' pk=i_object.pk %}">
                                 {{ i_object.main.object_name }}
                             </a>
                         </td>
                         <td>
-                            <a href="{% url 'my_geo_id:geo-code-detail' pk=i_object.pk %}">
+                            <a href="{% url 'my_geo_id:geo-country-list-detail' pk=i_object.pk %}">
                                 {{ i_object.code_type }}
                             </a>
                         </td>
