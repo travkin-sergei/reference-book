@@ -1,6 +1,8 @@
 from django.db import models
 from django_ckeditor_5.fields import CKEditor5Field
 
+db_schema = 'my_data_asset'
+
 
 class SystemColumns(models.Model):
     """Набор минимальных системных столбцов."""
@@ -63,7 +65,8 @@ class DataAssetType(SystemColumns):
     )
 
     class Meta:
-        db_table = 'data_asset_type'  # Указываем имя таблицы в базе данных
+        managed = True
+        db_table = f'{db_schema}\".\"data_asset_type'  # Указываем имя таблицы в базе данных
         unique_together = [["name", ]]
         verbose_name = '01.1 Тип источника данных'  # Указываем имя таблицы в админке
         verbose_name_plural = '01.1 Типы источников данных'  # Указываем имя таблицы в админке
@@ -86,7 +89,8 @@ class DataAssetStatus(SystemColumns):
     )
 
     class Meta:
-        db_table = 'data_asset_status'  # Указываем имя таблицы в базе данных
+        managed = True
+        db_table = f'{db_schema}\".\"data_asset_status'  # Указываем имя таблицы в базе данных
         unique_together = [["name", ]]
         verbose_name = '01.2 Статус источника данных'  # Указываем имя таблицы в админке
         verbose_name_plural = '01.2 Статус источников данных'  # Указываем имя таблицы в админке
@@ -165,7 +169,8 @@ class DataAsset(BaseModel):
     )
 
     class Meta:
-        db_table = 'data_asset'  # Указываем имя таблицы в базе данных
+        managed = True
+        db_table = f'{db_schema}\".\"data_asset'  # Указываем имя таблицы в базе данных
         constraints = [
             models.UniqueConstraint(fields=['url'], name='unique_data_asset_url')
         ]
@@ -193,7 +198,8 @@ class DataModel(BaseModel):
     )
 
     class Meta:
-        db_table = 'data_model'  # Указываем имя таблицы в базе данных
+        managed = True
+        db_table = f'{db_schema}\".\"data_model'  # Указываем имя таблицы в базе данных
         unique_together = [["data_asset", "name", ]]
         verbose_name = '02 Модель данных'  # Указываем имя таблицы в админке
         verbose_name_plural = '02 Модели данных'  # Указываем имя таблицы в админке
@@ -226,7 +232,8 @@ class DataTable(BaseModel):
     )
 
     class Meta:
-        db_table = 'data_table'  # Указываем имя таблицы в базе данных
+        managed = True
+        db_table = f'{db_schema}\".\"data_table'  # Указываем имя таблицы в базе данных
         unique_together = [["data_model", "type", "name", ]]
         verbose_name = '03 Таблица данных'  # Указываем имя таблицы в админке
         verbose_name_plural = '03 Таблицы данных'  # Указываем имя таблицы в админке
@@ -274,7 +281,8 @@ class DataValue(BaseModel):
     is_excluded = models.BooleanField(null=True, blank=True)  # Исключение
 
     class Meta:
-        db_table = 'data_value'
+        managed = True
+        db_table = f'{db_schema}\".\"data_value'
         unique_together = [['data_table', 'name', ]]
         ordering = ['created_at']  # Сортировка по дате создания (по убыванию)
         verbose_name = '04 Значения таблицы'  # Указываем имя таблицы в админке
@@ -304,7 +312,8 @@ class DataAssetGroup(SystemColumns):
     )
 
     class Meta:
-        db_table = 'data_asset_group'  # Указываем имя таблицы в базе данных
+        managed = True
+        db_table = f'{db_schema}\".\"data_asset_group'  # Указываем имя таблицы в базе данных
         unique_together = [["name", ]]
         verbose_name = '__ Группа источников'  # Указываем имя таблицы в админке
         verbose_name_plural = '__ Группы источников'  # Указываем имя таблицы в админке
@@ -335,7 +344,8 @@ class DataAssetGroupAsset(SystemColumns):
     )
 
     class Meta:
-        db_table = 'data_asset_group_list'
+        managed = True
+        db_table = f'{db_schema}\".\"data_asset_group_list'
         unique_together = [["name", "data_assets", ]]
         verbose_name = '__ Группа источников'
         verbose_name_plural = '__ Группы источников'
@@ -365,7 +375,8 @@ class DataModelGroup(SystemColumns):
     )
 
     class Meta:
-        db_table = 'data_model_group'  # Указываем имя таблицы в базе данных
+        managed = True
+        db_table = f'{db_schema}\".\"data_model_group'  # Указываем имя таблицы в базе данных
         # unique_together = [['name', 'data_models', ]] # накладываем ограничение на уникальность
         verbose_name = '__ Группа источников'  # Указываем имя таблицы в админке
         verbose_name_plural = '__ Группы источников'  # Указываем имя таблицы в админке
@@ -395,7 +406,8 @@ class DataTableGroup(SystemColumns):
     )
 
     class Meta:
-        db_table = 'data_table_group'  # Указываем имя таблицы в базе данных
+        managed = True
+        db_table = f'{db_schema}\".\"data_table_group'  # Указываем имя таблицы в базе данных
         # unique_together = [['group', 'data_table',]]  # накладываем ограничение на уникальность
         verbose_name = '__ Группа источников'  # Указываем имя таблицы в админке
         verbose_name_plural = '__ Группы источников'  # Указываем имя таблицы в админке
@@ -425,7 +437,7 @@ class DataValueGroup(SystemColumns):
     )
 
     class Meta:
-        db_table = 'data_value_groups'  # Указываем имя таблицы в базе данных
+        db_table = f'{db_schema}\".\"data_value_groups'  # Указываем имя таблицы в базе данных
         # unique_together = [['name', 'data_values',]]  # накладываем ограничение на уникальность
         verbose_name = '__ Группа источников'  # Указываем имя таблицы в админке
         verbose_name_plural = '__ Группы источников'  # Указываем имя таблицы в админке

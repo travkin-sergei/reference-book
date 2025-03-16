@@ -21,20 +21,22 @@ required_vars = [
     "DJANGO_MAX_NUM",
     "DJANGO_PAGE_SIZE",
     "DJANGO_MODE",
-    "DB_NAME",
-    "DB_USER",
-    "DB_PASS",
-    "DB_HOST",
-    "DB_PORT",
-    "DB_SCHEMA",
+    "DB_DEFAULT_NAME",
+    "DB_DEFAULT_USER",
+    "DB_DEFAULT_PASS",
+    "DB_DEFAULT_HOST",
+    "DB_DEFAULT_PORT",
+    "DB_SCHEMA",  # Список всех используемых схем в проекте
 ]
+
 info = {}
 for var in required_vars:
     try:
         value = env(var)
         info[var] = value
     except Exception as error:
-        logging.critical(f'Переменная отсутствует {var}')
+        logging.critical(f'Переменная отсутствует: {var}')
+        raise ImproperlyConfigured(f'Переменная окружения {var} отсутствует или неверна.')
 
 SECRET_KEY = info.get('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -56,7 +58,6 @@ INSTALLED_APPS = [
     'rest_framework',  # создание API
     'drf_spectacular',  # создание API
     'django_filters',  # фильтрация
-    # 'tinymce',  # Редактор текста
     'django_ckeditor_5',  # Редактор текста
 
     # -------------------------------
@@ -97,22 +98,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'mysite.wsgi.application'
 
+
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': info.get('DB_NAME'),
-        'USER': info.get('DB_USER'),
-        'PASSWORD': info.get('DB_PASS'),
-        'HOST': info.get('DB_HOST'),
-        'PORT': info.get('DB_PORT'),
-        'OPTIONS': {
-            'options': f'-c search_path={info.get('DB_SCHEMA')}',
+    'default':
+        {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': info.get('DB_DEFAULT_NAME'),
+            'USER': info.get('DB_DEFAULT_USER'),
+            'PASSWORD': info.get('DB_DEFAULT_PASS'),
+            'HOST': info.get('DB_DEFAULT_HOST'),
+            'PORT': info.get('DB_DEFAULT_PORT'),
+            'OPTIONS':
+                {
+                    'options': f'-c search_path={info.get("DB_SCHEMA")}'
+
+                },
         },
-    }
 }
 
 # Password validation

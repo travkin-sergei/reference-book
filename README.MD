@@ -1,12 +1,19 @@
-# Справочники"
+# Справочники
+
+## Список приложений:
+
+1. my_data_asset - это справочник источников данных
+2. my_geo_id - это справочник гео объектов
+
 
 ## Технологии
 
-1. Django==5.0.7 - основной фреймворк
+1. Django- основной фреймворк
 2. django-filter - фильтрация данных (выборка из базы)
-3. djangorestframework==3.15.2
+3. djangorestframework
 4. drf-spectacular - документирвоание API
 5. django-ckeditor - редактор текста
+6. PostgreSQL - база данных
 
 ## Запуск:
 
@@ -21,19 +28,21 @@ python3 -c "import secrets; print(secrets.token_urlsafe())"
 4. в корневой директории создать файл ".env"
 
 ```commandline
-SECRET_KEY=django-insecure-*************************************************
+DJANGO_SECRET_KEY=django-insecure-*********************************
+DJANGO_MAX_NUM=10000
+DJANGO_PAGE_SIZE=1000
+DJANGO_MODE=1
+
 DB_NAME=reference_book
 DB_USER=postgres
 DB_PASS=123456
 DB_HOST=localhost
 DB_PORT=5432
-DB_SCHEMA=reference_book
+DB_SCHEMA=******
+
 ```
 
-## Список приложений:
 
-1. my_data_asset - это справочник источников данных
-2. my_geo_id - это справочник гео объектов
 
 ## Структура проекта
 

@@ -7,6 +7,8 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import DateField
 
+db_schema = 'my_geo_id'
+
 
 def generate_unique_code(length=6):
     """Генерация набора из чисел и букв в нижнем регистре, с запретом на полностью числовые значения."""
@@ -66,7 +68,8 @@ class Language(BaseModel):
         return f'{self.name}'
 
     class Meta:
-        db_table = "geo_language"
+        managed = True
+        db_table = f'{db_schema}\".\"geo_language'
         db_table_comment = '{"name":"Список языков","description":"список языков"}'
         verbose_name = '01 список языков'
         verbose_name_plural = '01 список языков'
@@ -101,7 +104,8 @@ class GeoNames(BaseModel):
     history = HistoricalRecords(table_name='geo_names_history')
 
     class Meta:
-        db_table = "geo_names"
+        managed = True
+        db_table = f'{db_schema}\".\"geo_names'
         db_table_comment = (
             '{'
             '"name":"Название геобъекта",'
@@ -150,7 +154,8 @@ class GeoObject(BaseModel):
     history = HistoricalRecords(table_name='geo_object_history')
 
     class Meta:
-        db_table = "geo_object"
+        managed = True
+        db_table = f'{db_schema}\".\"geo_object'
         db_table_comment = '{"name":"Геообъекты","description":"Таблица создана для ведения списка уникальных геообъектов"}'
         verbose_name = '02 Геообъект'
         verbose_name_plural = '02 Геообъекты'
@@ -184,7 +189,8 @@ class GeoObjectMapType(BaseModel):
         return f'{self.map_type}'
 
     class Meta:
-        db_table = "geo_object_map_type"
+        managed = True
+        db_table = f'{db_schema}\".\"geo_object_map_type'
         db_table_comment = '{"name":"тип связи гео объекта","description":""}'
         verbose_name = '04 тип связи гео'
         verbose_name_plural = '04 тип связи гео'
@@ -210,7 +216,8 @@ class GeoObjectSynonym(BaseModel):
         return f'{self.language}-{self.name}'
 
     class Meta:
-        db_table = "geo_object_synonym"
+        managed = True
+        db_table = f'{db_schema}\".\"geo_object_synonym'
         db_table_comment = '{"name":"Синонимы названий геообъектов",}'
         verbose_name = '00 Синонимы геообъекта'
         verbose_name_plural = '02 Синонимы геообъектов'
@@ -227,7 +234,8 @@ class GeoObjectCodeType(BaseModel):
         return f'{self.code_type}'
 
     class Meta:
-        db_table = "geo_object_code_type"
+        managed = True
+        db_table = f'{db_schema}\".\"geo_object_code_type'
         verbose_name = '03 Тип кодов'
         verbose_name_plural = '03 Типы кодов'
 
@@ -243,7 +251,8 @@ class GeoObjectCode(BaseModel):
         return f'{self.main} - {self.code_type}'
 
     class Meta:
-        db_table = "geo_object_code"
+        managed = True
+        db_table = f'{db_schema}\".\"geo_object_code'
         verbose_name = '03.01 Справочник'
         verbose_name_plural = '03.01 Справочники'
 
@@ -270,7 +279,8 @@ class GeoObjectCodeSub(models.Model):
         return f'{self.geo_object_code} - {self.geo_object} ({self.code_name})'
 
     class Meta:
-        db_table = "geo_object_code_sub"
+        managed = True
+        db_table = f'{db_schema}\".\"geo_object_code_sub'
         db_table_comment = '{"name":"geo_object_code_sub",}'
         verbose_name = '03.02 Справочник'
         verbose_name_plural = '03.02 Справочники'
@@ -288,7 +298,8 @@ class GeoObjectMap(BaseModel):
         return f'{self.main}'
 
     class Meta:
-        db_table = "geo_object_map"
+        managed = True
+        db_table = f'{db_schema}\".\"geo_object_map'
         verbose_name = '04.01 Группировка'
         verbose_name_plural = '04.01 Группировка'
 
@@ -313,7 +324,8 @@ class GeoObjectMapSub(models.Model):
         return f'{self.geo_object_code} - {self.geo_object}'
 
     class Meta:
-        db_table = "geo_object_map_sub"
+        managed = True
+        db_table = f'{db_schema}\".\"geo_object_map_sub'
         db_table_comment = '{"name":"geo_object_map_sub",}'
         verbose_name = '04.02 Группировка'
         verbose_name_plural = '04.02 Группировка'
@@ -343,7 +355,8 @@ class GeoInfo(BaseModel):
         return str({self.geo})
 
     class Meta:
-        db_table = "geo_info"
+        managed = True
+        db_table = f'{db_schema}\".\"geo_info'
         verbose_name = 'Площадь территории'
         verbose_name_plural = 'Площадь территории'
 
@@ -362,3 +375,7 @@ class MapLocation(models.Model):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        managed = True
+        db_table = f'{db_schema}\".\"map_location'
