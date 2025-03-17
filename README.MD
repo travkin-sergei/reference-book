@@ -78,7 +78,14 @@ templates/_inc/_nav.html в этот шаблон добавить
 ```
     
 
+# Пересборка образа
 
+```bash
+  docker build -t your_image_name .
+```
 
-
-
+Запуск контейнера
+```bash
+  docker run -p 8000:8000 your_image_name
+```
+[Перейти на локальный сервер http://127.0.0.1:8000](http://127.0.0.1:8000/)
