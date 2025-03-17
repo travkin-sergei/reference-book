@@ -79,6 +79,32 @@ templates/_inc/_nav.html в этот шаблон добавить
     
 
 # Пересборка образа
+База данных должна быть локально на машине, а не в контейнере. делал под себя!!!  
+
+Обращаю внимание на допущения которые я сделал.
+файл .env
+```shell
+DJANGO_SECRET_KEY=django-insecure-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+DJANGO_MAX_NUM=10000
+DJANGO_PAGE_SIZE=1000
+DJANGO_MODE=1
+
+DB_DEFAULT_NAME=XXXXXXXXXXXXXXXX
+DB_DEFAULT_USER=postgres
+DB_DEFAULT_PASS=123456
+DB_DEFAULT_HOST=host.docker.internal
+DB_DEFAULT_PORT=5432
+DB_SCHEMA=my_default,my_geo_id,my_data_asset
+```
+
+.dockerignore
+```
+    # .env/
+```
+Dockerfile
+```shell
+  COPY .env .env
+```
 
 ```bash
   docker build -t your_image_name .
