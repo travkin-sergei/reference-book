@@ -196,6 +196,19 @@ class DataAssetGroupsView(ListView):
         context['filter'] = self.filter
         return context
 
+    # def get_context_data(self, **kwargs):
+    #     """Добавляем источники данных в контекст."""
+    #     context = super().get_context_data(**kwargs)
+    #     group_asset = self.object  # Получаем текущую группу источников данных
+    #
+    #     # Получаем все связанные источники данных через related_name
+    #     data_assets = DataAssetGroupAsset.objects.filter(
+    #         name=group_asset
+    #     )  # Убедитесь, что group_asset - это экземпляр DataAssetGroup
+
+        context['data_assets'] = data_assets  # Передаем все источники данных в контекст
+        return context
+
 
 class DataAssetGroupsDetailView(DetailView):
     """Отображение групп источников данных."""
@@ -211,8 +224,8 @@ class DataAssetGroupsDetailView(DetailView):
 
         # Получаем все связанные источники данных через related_name
         data_assets = DataAssetGroupAsset.objects.filter(
-            name=group_asset)  # Убедитесь, что group_asset - это экземпляр DataAssetGroup
+            name=group_asset
+        )  # Убедитесь, что group_asset - это экземпляр DataAssetGroup
 
         context['data_assets'] = data_assets  # Передаем все источники данных в контекст
         return context
-

@@ -7,8 +7,8 @@
         <ul class="list-group">
             {% for i_obj in data_assets %}
             <li class="list-group-item">
-                <a href="{% url 'my_data_asset:data-asset-detail' i_obj.id %}">
-                    Прейти к {{ i_obj.uir|default:"" }} {{ i_obj.data_assets.name|default:"" }}
+                <a href="{% url 'my_data_asset:data-asset-detail' i_obj.data_assets.id %}">
+                    Прейти к {{ i_obj.data_assets.name|default:"" }}
                 </a>
             </li>
             {% empty %}
