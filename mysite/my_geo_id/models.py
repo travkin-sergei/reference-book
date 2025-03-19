@@ -253,6 +253,7 @@ class GeoObjectCode(BaseModel):
     class Meta:
         managed = True
         db_table = f'{db_schema}\".\"geo_object_code'
+        ordering = ['main','-code_type']
         verbose_name = '03.01 Справочник'
         verbose_name_plural = '03.01 Справочники'
 
