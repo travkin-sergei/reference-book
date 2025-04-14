@@ -3,7 +3,7 @@ from django_filters import CharFilter
 from .models import (
     DataAsset,
     DataModel,
-    DataAssetGroup,
+    DataAssetGroup, AssetStat,
 )
 
 
@@ -42,3 +42,13 @@ class DataAssetGroupFilter(django_filters.FilterSet):
     class Meta:
         model = DataAssetGroup
         fields = 'name', 'description',
+
+
+class AssetStatFilter(django_filters.FilterSet):
+    """Фильтрация моделей данных."""
+
+    uir = CharFilter(field_name='uir__uir', lookup_expr='icontains', )  # Замените 'name' на нужное поле
+
+    class Meta:
+        model = AssetStat
+        fields = 'uir',

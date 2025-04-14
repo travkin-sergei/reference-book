@@ -1,44 +1,44 @@
 from rest_framework import serializers
 from ..models import (
-    GeoNames,
-    GeoObject,
-    GeoObjectMap, GeoObjectMapSub,
-    GeoObjectCodeType,
-    GeoObjectCode,
+    Synonym,
+    Object,
+    ObjectMap, ObjectMapSub,
+    ObjectCodeType,
+    ObjectCode,
 )
 
 
-class GeoNamesSerializer(serializers.ModelSerializer):
+class SynonymSerializer(serializers.ModelSerializer):
     """Сериализация для отображения в DataAssetSerializer."""
 
     class Meta:
-        model = GeoNames
+        model = Synonym
         fields = 'name', 'language',
 
 
-class GeoObjectMapSubSerializer(serializers.ModelSerializer):
+class ObjectMapSubSerializer(serializers.ModelSerializer):
     class Meta:
-        model = GeoObjectMapSub
+        model = ObjectMapSub
         fields = [
             'id',  # Поле ID
-            'geo_object_code',  # Внешний ключ на GeoObjectMap
-            'geo_object',  # Внешний ключ на GeoObject
-            'code_type',  # Внешний ключ на GeoObjectMapType
+            'object_code',  # Внешний ключ на ObjectMap
+            'object',  # Внешний ключ на Object
+            'code_type',  # Внешний ключ на ObjectMapType
             'date_start',  # Дата начала действия
             'date_stop',  # Дата прекращения действия
         ]
 
 
-class GeoObjectMapSerializer(serializers.ModelSerializer):
-    related_objects = GeoObjectMapSubSerializer(many=True, read_only=True)
+class ObjectMapSerializer(serializers.ModelSerializer):
+    related_objects = ObjectMapSubSerializer(many=True, read_only=True)
 
     class Meta:
-        model = GeoObjectMap
+        model = ObjectMap
         fields = 'id', 'is_active', 'main', 'related_objects',
 
 
-class GeoObjectSerializer(serializers.ModelSerializer):
+class ObjectSerializer(serializers.ModelSerializer):
     class Meta:
-        model = GeoObject
+        model = Object
         fields = '__all__'
         # fields = 'object_code', 'object_name', 'date_start', 'date_stop',

@@ -10,13 +10,13 @@ from django.views.generic import (
 
 from ..filters import (
     DataAssetFilter,
-    DataModelFilter, DataAssetGroupFilter,
+    DataModelFilter, DataAssetGroupFilter, AssetStatFilter,
 )
 from ..models import (
     DataAsset,
     DataModel,
     DataTable,
-    DataValue, DataAssetGroup, DataAssetGroupAsset,
+    DataValue, DataAssetGroup, DataAssetGroupAsset, AssetStat,
 )
 
 
@@ -36,7 +36,7 @@ class AboutAppView(TemplateView):
 class DataAssetView(ListView):
     """Отображение списка источников данных с возможностью фильтрации данных на web странице."""
 
-    template_name = 'my_data_asset/data-asset.html'
+    template_name = 'my_data_asset/asset.html'
     queryset = DataAsset.objects.filter(is_active=True)
     context_object_name = 'data_assets'
     paginate_by = 20
@@ -58,7 +58,7 @@ class DataAssetDetailView(DetailView):
     """Представление для отображения деталей источника данных."""
 
     queryset = DataAsset.objects.filter(is_active=True)
-    template_name = 'my_data_asset/data-asset-detail.html'
+    template_name = 'my_data_asset/asset-detail.html'
     context_object_name = 'data_asset_detail'
 
     def get_context_data(self, **kwargs):
@@ -81,7 +81,7 @@ class DataAssetDetailView(DetailView):
 class DataModelView(ListView):
     """Отображение списка моделей данных с возможностью фильтрации данных на web странице."""
 
-    template_name = 'my_data_asset/data-model.html'
+    template_name = 'my_data_asset/model.html'
     context_object_name = 'data_model'
     paginate_by = 20
 
@@ -101,7 +101,7 @@ class DataModelView(ListView):
 class DataModelDetailView(DetailView):
     """Представление для отображения деталей моделей данных."""
 
-    template_name = 'my_data_asset/data-model-detail.html'
+    template_name = 'my_data_asset/model-detail.html'
     context_object_name = 'data_model_detail'
     queryset = DataModel.objects.filter(is_active=True)
 
@@ -133,7 +133,7 @@ class DataModelDetailView(DetailView):
 class DataTableView(ListView):
     """Отображение списка моделей данных с возможностью фильтрации данных на web странице."""
 
-    template_name = 'my_data_asset/data-model.html'
+    template_name = 'my_data_asset/model.html'
     queryset = DataTable.objects.filter(is_active=True)
     context_object_name = 'data_model'
     paginate_by = 20
@@ -156,7 +156,7 @@ class DataTableDetailView(DetailView):
 
     queryset = DataTable.objects.filter(is_active=True)
 
-    template_name = 'my_data_asset/data-table-detail.html'
+    template_name = 'my_data_asset/table-detail.html'
     context_object_name = 'data_table_detail'
 
     def get_context_data(self, **kwargs):
@@ -181,7 +181,7 @@ class DataAssetGroupsView(ListView):
     """Отображение групп источников данных."""
 
     queryset = DataAssetGroup.objects.filter(is_active=True)
-    template_name = 'my_data_asset/data-asset-groups.html'
+    template_name = 'my_data_asset/asset-groups.html'
     context_object_name = 'data_asset_groups'
 
     def get_queryset(self):
@@ -196,25 +196,12 @@ class DataAssetGroupsView(ListView):
         context['filter'] = self.filter
         return context
 
-    # def get_context_data(self, **kwargs):
-    #     """Добавляем источники данных в контекст."""
-    #     context = super().get_context_data(**kwargs)
-    #     group_asset = self.object  # Получаем текущую группу источников данных
-    #
-    #     # Получаем все связанные источники данных через related_name
-    #     data_assets = DataAssetGroupAsset.objects.filter(
-    #         name=group_asset
-    #     )  # Убедитесь, что group_asset - это экземпляр DataAssetGroup
-
-        context['data_assets'] = data_assets  # Передаем все источники данных в контекст
-        return context
-
 
 class DataAssetGroupsDetailView(DetailView):
     """Отображение групп источников данных."""
 
     queryset = DataAssetGroup.objects.filter(is_active=True)  # Убедитесь, что это правильная модель
-    template_name = 'my_data_asset/data-asset-groups-detail.html'
+    template_name = 'my_data_asset/asset-groups-detail.html'
     context_object_name = 'data_asset_group'
 
     def get_context_data(self, **kwargs):
@@ -229,3 +216,31 @@ class DataAssetGroupsDetailView(DetailView):
 
         context['data_assets'] = data_assets  # Передаем все источники данных в контекст
         return context
+
+
+class AssetStatListView(ListView):
+    """Отображение статистики источников данных."""
+
+    queryset = AssetStat.objects.all()  # Получаем все объекты AssetStat
+    template_name = 'my_data_asset/asset-stat.html'  # Укажите путь к вашему шаблону
+    context_object_name = 'asset_stats'  # Имя контекста для списка объектов
+
+    def get_queryset(self):
+        """Фильтруем queryset на основе параметров запроса."""
+        queryset = super().get_queryset()
+        self.filter = AssetStatFilter(self.request.GET, queryset=queryset)  # Инициализируем фильтр
+        return self.filter.qs  # Возвращаем отфильтрованный queryset
+
+    def get_context_data(self, **kwargs):
+        """Добавляем фильтр в контекст."""
+        context = super().get_context_data(**kwargs)
+        context['filter'] = self.filter  # Добавляем фильтр в контекст
+        return context
+
+
+class AssetStatDetailView(DetailView):
+    """Отображение групп источников данных."""
+
+    queryset = AssetStat.objects.filter(is_active=True)  # Убедитесь, что это правильная модель
+    template_name = 'my_data_asset/asset-stat-detail.html'  # Укажите путь к вашему шаблону
+    context_object_name = 'asset_stats_detail'  # Имя контекста для списка объектов

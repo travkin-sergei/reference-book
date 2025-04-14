@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.functions import Now
 from django_ckeditor_5.fields import CKEditor5Field
 
 db_schema = 'my_data_asset'
@@ -8,19 +9,21 @@ class SystemColumns(models.Model):
     """Набор минимальных системных столбцов."""
 
     created_at = models.DateTimeField(
-        auto_now_add=True
-        , db_comment='{"name":"Строка в базе данных создана.",}'
-        , help_text="Дата создания строки в текущей базе данных.",
+        db_default=Now()
+        , verbose_name='Создано'
+        , help_text="Создано"
+
     )
     updated_at = models.DateTimeField(
-        auto_now=True
-        , db_comment='{"name":"Строка в базе данных обновлена.",}'
-        , help_text="Дата обновления строки в текущей базе данных.",
+        db_default=Now()
+        , verbose_name='Обновлено'
+        , help_text="Обновлено"
+
     )
     is_active = models.BooleanField(
-        default=True
-        , db_comment='{"name":"Стока в базе данных активна.",}'
-        , help_text="Является ли запись действующей на текущей момент?",
+        db_default=True
+        , verbose_name='Запись активна?'
+        , help_text="Запись активна?"
     )
 
     class Meta:
@@ -64,15 +67,15 @@ class DataAssetType(SystemColumns):
         , help_text="Тип источника данных.",
     )
 
+    def __str__(self):
+        return self.name or 'NO DATA'
+
     class Meta:
         managed = True
-        db_table = f'{db_schema}\".\"data_asset_type'  # Указываем имя таблицы в базе данных
+        db_table = f'{db_schema}\".\"asset_type'  # Указываем имя таблицы в базе данных
         unique_together = [["name", ]]
         verbose_name = '01.1 Тип источника данных'  # Указываем имя таблицы в админке
         verbose_name_plural = '01.1 Типы источников данных'  # Указываем имя таблицы в админке
-
-    def __str__(self):
-        return self.name or 'NO DATA'
 
 
 class DataAssetStatus(SystemColumns):
@@ -88,15 +91,15 @@ class DataAssetStatus(SystemColumns):
         , db_comment='{"name":"Статус ресурса.",}'
     )
 
+    def __str__(self):
+        return self.name or 'NO DATA'
+
     class Meta:
         managed = True
-        db_table = f'{db_schema}\".\"data_asset_status'  # Указываем имя таблицы в базе данных
+        db_table = f'{db_schema}\".\"assets_status'  # Указываем имя таблицы в базе данных
         unique_together = [["name", ]]
         verbose_name = '01.2 Статус источника данных'  # Указываем имя таблицы в админке
         verbose_name_plural = '01.2 Статус источников данных'  # Указываем имя таблицы в админке
-
-    def __str__(self):
-        return self.name or 'NO DATA'
 
 
 class DataAsset(BaseModel):
@@ -106,38 +109,24 @@ class DataAsset(BaseModel):
      - Уникальный идентификатор ресурса;
     """
 
+    uir = models.CharField(
+        primary_key=True
+        , max_length=255
+        , verbose_name="УИР."
+        , db_comment='{"name":"Уникальный идентификатор ресурса",}'
+        , help_text="Уникальный идентификатор ресурса.",
+    )
     type = models.ForeignKey(
         'DataAssetType', on_delete=models.CASCADE, null=True, blank=True
         , verbose_name="Тип источника данных"
         , db_comment='{"name":"Тип источника данных.",}'
         , help_text="Тип источника данных."
-
-    )
-    last_update = models.DateField(
-        auto_now=True
-        , verbose_name="Последнее обновление."
-        , db_comment='{'
-                     'name":"Последнее обновление информации об источнике", '
-                     '"description":"не надо путать с обновлением строки базы данных.",'
-                     '}'
-        , help_text="Последнее обновление информации об источнике данных.",
-    )
-    uir = models.CharField(
-        max_length=255, blank=True, null=True
-        , verbose_name="УИР."
-        , db_comment='{"name":"Уникальный идентификатор ресурса",}'
-        , help_text="Уникальный идентификатор ресурса.",
     )
     url = models.URLField(
         blank=True, null=True
         , verbose_name="URL."
         , db_comment='{"name":"URL ссылка.",}'
         , help_text="URL ссылка.",
-    )
-    status = models.ForeignKey(
-        'DataAssetStatus', on_delete=models.CASCADE, null=True, blank=True
-        , verbose_name="Статус"
-        , db_comment='{"name":"Статус",}'
     )
     name = models.CharField(
         max_length=255, blank=True, null=True
@@ -151,12 +140,6 @@ class DataAsset(BaseModel):
         , db_comment='{"name":"Описание ресурса",}'
         , help_text="Описание ресурса.",
     )
-    version = models.CharField(
-        max_length=255, blank=True, null=True
-        , verbose_name="Версия"
-        , db_comment='{"name":"Версия ресурса.",}'
-        , help_text="Версия ресурса.",
-    )
     host = models.CharField(
         max_length=255, blank=True, null=True
         , verbose_name="Хост"
@@ -168,18 +151,90 @@ class DataAsset(BaseModel):
         , db_comment='{"name":"Порт",}'
     )
 
+    def __str__(self):
+        return f'{self.uir}' or 'NO DATA'
+
     class Meta:
         managed = True
-        db_table = f'{db_schema}\".\"data_asset'  # Указываем имя таблицы в базе данных
-        constraints = [
-            models.UniqueConstraint(fields=['url'], name='unique_data_asset_url')
-        ]
+        db_table = f'{db_schema}\".\"assets'  # Указываем имя таблицы в базе данных
         ordering = ['name']  # Сортировка по дате создания (по убыванию)
+        unique_together = (('uir',),)
         verbose_name = '01 Источник данных'  # Указываем имя таблицы в админке
         verbose_name_plural = '01 Источники данных'  # Указываем имя таблицы в админке
 
-    def __str__(self):
-        return f'{self.status} - {self.name}' or 'NO DATA'
+
+class AssetStat(BaseModel):
+    """Статистка источника данных."""
+
+    uir = models.ForeignKey('DataAsset', on_delete=models.CASCADE)  # Внешний ключ
+
+    status = models.ForeignKey(
+        'DataAssetStatus', on_delete=models.CASCADE, null=True, blank=True
+        , verbose_name="Статус"
+        , db_comment='{"name":"Статус",}'
+    )
+    date_last = models.DateField(
+        blank=True, null=True
+        , verbose_name="По состоянию на"
+        , db_comment='{"name":"По состоянию на",}'
+    )
+    row_last = models.PositiveIntegerField(
+        blank=True, null=True
+        , verbose_name="Количество строк последнего обновления."
+        , db_comment='{"name":"Количество строк последнего обновления.",}'
+    )
+    row_actual = models.PositiveIntegerField(
+        blank=True, null=True
+        , verbose_name="Количество актуальных строк."
+        , db_comment='{"name":"Количество актуальных строк.",}'
+    )
+    version = models.CharField(
+        max_length=255, blank=True, null=True
+        , verbose_name="Версия"
+        , db_comment='{"name":"Версия ресурса.",}'
+        , help_text="Версия ресурса.",
+    )
+    control_1 = models.PositiveIntegerField(
+        blank=True, null=True
+        , verbose_name="Контрольная цифра №1."
+        , db_comment='{"name":"Контрольная цифра №1.",}'
+    )
+    control_2 = models.PositiveIntegerField(
+        blank=True, null=True
+        , verbose_name="Контрольная цифра №2."
+        , db_comment='{"name":"Контрольная цифра №2.",}'
+    )
+
+    class Meta:
+        managed = True
+        db_table = f'{db_schema}\".\"assets_stat'  # Указываем имя таблицы в базе данных
+        ordering = ['uir', 'date_last']  # Сортировка по дате создания (по убыванию)
+        unique_together = (('uir', 'date_last'),)
+        verbose_name = '01.01 Статистика источника данных'  # Указываем имя таблицы в админке
+        verbose_name_plural = '01.01 Статистика источника данных'  # Указываем имя таблицы в админке
+
+
+class AssetLink(BaseModel):
+    asset_stat = models.ForeignKey(
+        'AssetStat', on_delete=models.CASCADE, null=True, blank=True
+        , verbose_name="Ссылка на файлы обновлений."
+        , db_comment='{"name":"Ссылка на файлы обновлений.",}'
+    )
+    link_file = models.URLField(
+        blank=True, null=True
+        , unique=True
+        , verbose_name="URL."
+        , db_comment='{"name":"URL ссылка.",}'
+        , help_text="URL ссылка.",
+    )
+
+    class Meta:
+        managed = True
+        db_table = f'{db_schema}\".\"assets_link'
+        # ordering = ['link_file', ]
+        # unique_together = (('uir', 'date_last'),)
+        verbose_name = '01.02 Ссылка на файлы источника данных'
+        verbose_name_plural = '01.02 Ссылка на файлы источника данных'
 
 
 class DataModel(BaseModel):
@@ -197,15 +252,15 @@ class DataModel(BaseModel):
         blank=True, null=True
     )
 
+    def __str__(self):
+        return f'{self.data_asset} - {self.name}' or 'NO DATA'
+
     class Meta:
         managed = True
-        db_table = f'{db_schema}\".\"data_model'  # Указываем имя таблицы в базе данных
+        db_table = f'{db_schema}\".\"models'  # Указываем имя таблицы в базе данных
         unique_together = [["data_asset", "name", ]]
         verbose_name = '02 Модель данных'  # Указываем имя таблицы в админке
         verbose_name_plural = '02 Модели данных'  # Указываем имя таблицы в админке
-
-    def __str__(self):
-        return f'{self.data_asset} - {self.name}' or 'NO DATA'
 
 
 class DataTable(BaseModel):
@@ -231,15 +286,15 @@ class DataTable(BaseModel):
         , help_text="Комментарий."
     )
 
+    def __str__(self):
+        return f'{self.data_model} - {self.type} - {self.name}' or 'NO DATA'
+
     class Meta:
         managed = True
         db_table = f'{db_schema}\".\"data_table'  # Указываем имя таблицы в базе данных
         unique_together = [["data_model", "type", "name", ]]
         verbose_name = '03 Таблица данных'  # Указываем имя таблицы в админке
         verbose_name_plural = '03 Таблицы данных'  # Указываем имя таблицы в админке
-
-    def __str__(self):
-        return f'{self.data_model} - {self.type} - {self.name}' or 'NO DATA'
 
 
 class DataValue(BaseModel):
@@ -280,16 +335,16 @@ class DataValue(BaseModel):
     is_primary_key = models.BooleanField(null=True, blank=True)  # Первичный ключ
     is_excluded = models.BooleanField(null=True, blank=True)  # Исключение
 
+    def __str__(self):
+        return f'{self.data_table} - {self.type} - {self.name}' or 'NO DATA'
+
     class Meta:
         managed = True
-        db_table = f'{db_schema}\".\"data_value'
+        db_table = f'{db_schema}\".\"value_table'
         unique_together = [['data_table', 'name', ]]
         ordering = ['created_at']  # Сортировка по дате создания (по убыванию)
         verbose_name = '04 Значения таблицы'  # Указываем имя таблицы в админке
         verbose_name_plural = '04 Значения таблицы'  # Указываем имя таблицы в админке
-
-    def __str__(self):
-        return f'{self.data_table} - {self.type} - {self.name}' or 'NO DATA'
 
 
 # =============================================== Группировки источников ===============================================
@@ -311,15 +366,15 @@ class DataAssetGroup(SystemColumns):
         , help_text="Описание групп источников данных.",
     )
 
+    def __str__(self):
+        return f'{self.name}' or 'NO DATA'
+
     class Meta:
         managed = True
-        db_table = f'{db_schema}\".\"data_asset_group'  # Указываем имя таблицы в базе данных
+        db_table = f'{db_schema}\".\"asset_group'  # Указываем имя таблицы в базе данных
         unique_together = [["name", ]]
         verbose_name = '__ Группа источников'  # Указываем имя таблицы в админке
         verbose_name_plural = '__ Группы источников'  # Указываем имя таблицы в админке
-
-    def __str__(self):
-        return f'{self.name}' or 'NO DATA'
 
 
 class DataAssetGroupAsset(SystemColumns):
@@ -343,15 +398,15 @@ class DataAssetGroupAsset(SystemColumns):
         , help_text="Список описанных источников данных."
     )
 
+    def __str__(self):
+        return f'{self.name} - {self.data_assets}' or 'NO DATA'
+
     class Meta:
         managed = True
-        db_table = f'{db_schema}\".\"data_asset_group_list'
+        db_table = f'{db_schema}\".\"asset_group_list'
         unique_together = [["name", "data_assets", ]]
         verbose_name = '__ Группа источников'
         verbose_name_plural = '__ Группы источников'
-
-    def __str__(self):
-        return f'{self.name} - {self.data_assets}' or 'NO DATA'
 
 
 class DataModelGroup(SystemColumns):
@@ -374,15 +429,15 @@ class DataModelGroup(SystemColumns):
         , help_text="Группировка источников данны."
     )
 
+    def __str__(self):
+        return f'{self.name} - {self.data_models}' or 'NO DATA'
+
     class Meta:
         managed = True
-        db_table = f'{db_schema}\".\"data_model_group'  # Указываем имя таблицы в базе данных
+        db_table = f'{db_schema}\".\"model_group'  # Указываем имя таблицы в базе данных
         # unique_together = [['name', 'data_models', ]] # накладываем ограничение на уникальность
         verbose_name = '__ Группа источников'  # Указываем имя таблицы в админке
         verbose_name_plural = '__ Группы источников'  # Указываем имя таблицы в админке
-
-    def __str__(self):
-        return f'{self.name} - {self.data_models}' or 'NO DATA'
 
 
 class DataTableGroup(SystemColumns):
@@ -405,15 +460,15 @@ class DataTableGroup(SystemColumns):
         , help_text="Группировка источников данны."
     )
 
+    def __str__(self):
+        return f'{self.name} - {self.data_tables}' or 'NO DATA'
+
     class Meta:
         managed = True
-        db_table = f'{db_schema}\".\"data_table_group'  # Указываем имя таблицы в базе данных
+        db_table = f'{db_schema}\".\"table_group'  # Указываем имя таблицы в базе данных
         # unique_together = [['group', 'data_table',]]  # накладываем ограничение на уникальность
         verbose_name = '__ Группа источников'  # Указываем имя таблицы в админке
         verbose_name_plural = '__ Группы источников'  # Указываем имя таблицы в админке
-
-    def __str__(self):
-        return f'{self.name} - {self.data_tables}' or 'NO DATA'
 
 
 class DataValueGroup(SystemColumns):
@@ -436,11 +491,11 @@ class DataValueGroup(SystemColumns):
         , help_text="Группировка источников данны."
     )
 
+    def __str__(self):
+        return f'{self.name} - {self.data_values}' or 'NO DATA'
+
     class Meta:
-        db_table = f'{db_schema}\".\"data_value_groups'  # Указываем имя таблицы в базе данных
+        db_table = f'{db_schema}\".\"value_groups'  # Указываем имя таблицы в базе данных
         # unique_together = [['name', 'data_values',]]  # накладываем ограничение на уникальность
         verbose_name = '__ Группа источников'  # Указываем имя таблицы в админке
         verbose_name_plural = '__ Группы источников'  # Указываем имя таблицы в админке
-
-    def __str__(self):
-        return f'{self.name} - {self.data_values}' or 'NO DATA'

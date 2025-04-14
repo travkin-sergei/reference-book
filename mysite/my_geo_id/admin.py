@@ -4,27 +4,32 @@ from django.forms.models import BaseInlineFormSet
 
 from .models import (
     Language, generate_unique_code,
-    GeoNames,
-    GeoObject,
-    GeoObjectMap,
-    GeoObjectMapSub,
-    GeoObjectCodeType,
-    GeoObjectCode,
-
-    GeoObjectMapType, GeoObjectCodeSub, GeoInfo,
+    Synonym,
+    Object,
+    ObjectMap,
+    ObjectMapSub,
+    ObjectCodeType,
+    ObjectCode,
+    ObjectMapType, ObjectCodeSub, Info,
 )
 
 
 class BaseAdmin(admin.ModelAdmin):
     """Базовые настройки."""
-
-    readonly_fields = 'user',
+    readonly_fields = 'user', 'created_at', 'updated_at',
     exclude = 'user',
 
     def save_model(self, request, obj, form, change):
         """Сохранение автора записи."""
         obj.user = request.user
         super().save_model(request, obj, form, change)
+
+    def get_readonly_fields(self, request, obj=None):
+        # Если объект уже существует, делаем поля readonly
+        if obj:
+            return self.readonly_fields
+        return self.readonly_fields
+
 
 
 @admin.register(Language)
@@ -35,8 +40,8 @@ class LanguageAdmin(BaseAdmin):
     search_fields = 'language', 'name',
 
 
-@admin.register(GeoNames)
-class GeoNamesAdmin(BaseAdmin):
+@admin.register(Synonym)
+class SynonymAdmin(BaseAdmin):
     """Список названий."""
 
     list_display = 'name', 'language',
@@ -44,18 +49,18 @@ class GeoNamesAdmin(BaseAdmin):
     autocomplete_fields = 'language',
 
 
-@admin.register(GeoObjectMapType)
-class GeoObjectMapTypeAdmin(BaseAdmin):
+@admin.register(ObjectMapType)
+class ObjectMapTypeAdmin(BaseAdmin):
     list_display = 'map_type',
     list_display_links = 'map_type',
     search_fields = 'map_type',
 
 
-class GeoInfoForm(forms.ModelForm):
+class InfoForm(forms.ModelForm):
     """Кастомная форма для GeoInfo, чтобы сделать поле user необязательным в форме."""
 
     class Meta:
-        model = GeoInfo
+        model = Info
         fields = '__all__'
 
     def __init__(self, *args, **kwargs):
@@ -64,12 +69,12 @@ class GeoInfoForm(forms.ModelForm):
             self.fields['user'].required = False  # Делаем поле user необязательным в форме
 
 
-class GeoInfoFormSet(BaseInlineFormSet):
+class InfoFormSet(BaseInlineFormSet):
     def save_new(self, form, commit=True):
         """Переопределяем метод для установки автора при создании новой записи."""
         instance = super().save_new(form, commit=False)
         instance.user = self.request.user  # Устанавливаем автора
-        instance.task = self.instance.task  # Устанавливаем task из родительского GeoObject
+        instance.task = self.instance.task  # Устанавливаем task из родительского Object
         if commit:
             instance.save()
         return instance
@@ -78,19 +83,19 @@ class GeoInfoFormSet(BaseInlineFormSet):
         """Переопределяем метод для установки автора и task при изменении существующей записи."""
         instance = super().save_existing(form, instance, commit=False)
         instance.user = self.request.user  # Устанавливаем автора
-        instance.task = self.instance.task  # Устанавливаем task из родительского GeoObject
+        instance.task = self.instance.task  # Устанавливаем task из родительского Object
         if commit:
             instance.save()
         return instance
 
 
-class GeoInfoInline(admin.TabularInline):
+class InfoInline(admin.TabularInline):
     """Inline для редактирования дополнительной информации о геообъекте."""
 
-    model = GeoInfo
+    model = Info
     extra = 1
-    form = GeoInfoForm  # Используем кастомную форму
-    formset = GeoInfoFormSet
+    form = InfoForm  # Используем кастомную форму
+    formset = InfoFormSet
     exclude = ('user', 'task')  # Скрываем поля user и task из формы
 
     def get_formset(self, request, *args, **kwargs):
@@ -100,23 +105,23 @@ class GeoInfoInline(admin.TabularInline):
         return formset
 
 
-@admin.register(GeoObject)
-class GeoObjectAdmin(BaseAdmin):
+@admin.register(Object)
+class ObjectAdmin(BaseAdmin):
     """Админка для списка уникальных геообъектов."""
 
-    inlines = [GeoInfoInline]
+    inlines = [InfoInline]
 
-    readonly_fields = 'user', 'object_code',
-    list_display = 'object_code', 'is_active', 'object_name', 'user', 'task',
-    list_display_links = 'object_code', 'object_name', 'user', 'task',
-    search_fields = 'object_code', 'object_name', 'task',
+    readonly_fields = 'geo_id', 'user',
+    list_display = 'geo_id', 'is_active', 'object_name', 'user', 'task',
+    list_display_links = 'geo_id', 'object_name', 'user', 'task',
+    search_fields = 'geo_id', 'object_name', 'task',
 
-    autocomplete_fields = ['geo_name']
-    filter_horizontal = ['geo_name']
+    autocomplete_fields = ['name']
+    filter_horizontal = ['name']
 
     def get_queryset(self, request):
         """Отображение связанных в модели многие ко многим."""
-        result = GeoObject.objects.prefetch_related("geo_name").all()
+        result = Object.objects.prefetch_related("name").all()
         return result
 
     def save_model(self, request, obj, form, change):
@@ -125,7 +130,7 @@ class GeoObjectAdmin(BaseAdmin):
         if not obj.object_code:  # Проверяем, что код еще не задан
             obj.object_code = generate_unique_code()  # Генерируем уникальный код
             # Проверяем уникальность кода
-            existing_codes = set(GeoObject.objects.filter(is_active=True).values_list('object_code', flat=True))
+            existing_codes = set(Object.objects.filter(is_active=True).values_list('geo_id', flat=True))
             while obj.object_code in existing_codes:
                 obj.object_code = generate_unique_code()
         super().save_model(request, obj, form, change)
@@ -137,38 +142,38 @@ class GeoObjectAdmin(BaseAdmin):
             if not instance.user_id:  # Устанавливаем автора, если он еще не задан
                 instance.user = request.user
             if not instance.task:  # Устанавливаем task, если он еще не задан
-                instance.task = form.instance.task  # Берем task из родительского GeoObject
+                instance.task = form.instance.task  # Берем task из родительского Object
             instance.save()
         formset.save_m2m()
 
 
-@admin.register(GeoObjectCodeType)
-class GeoObjectCodeTypeAdmin(BaseAdmin):
+@admin.register(ObjectCodeType)
+class ObjectCodeTypeAdmin(BaseAdmin):
     list_display = 'id', 'code_type',
     list_display_links = 'id',
     search_fields = 'code_type',
 
 
-class GeoObjectCodeSubInline(admin.TabularInline):
-    """Инлайн для управления связями между GeoObjectCode и GeoObject с дополнительным полем code_name."""
+class ObjectCodeSubInline(admin.TabularInline):
+    """Инлайн для управления связями между ObjectCode и Object с дополнительным полем code_name."""
 
-    model = GeoObjectCodeSub
+    model = ObjectCodeSub
     extra = 1
-    autocomplete_fields = 'geo_object', 'name',
+    autocomplete_fields = 'object', 'name',
     exclude = 'user',
 
 
 # 03.01 Справочник
-@admin.register(GeoObjectCode)
-class GeoObjectCodeAdmin(BaseAdmin):
-    """Админка для GeoObjectCode."""
+@admin.register(ObjectCode)
+class ObjectCodeAdmin(BaseAdmin):
+    """Админка для ObjectCode."""
 
-    inlines = [GeoObjectCodeSubInline]
+    inlines = [ObjectCodeSubInline]
 
-    list_display = 'main', 'code_type',
-    list_display_links = 'main',
-    search_fields = 'main__object_name', 'code_type__code_type',
-    autocomplete_fields = 'main', 'code_type',
+    list_display = 'geo', 'code_type',
+    list_display_links = 'geo',
+    search_fields = 'geo__object_name', 'code_type__code_type',
+    autocomplete_fields = 'geo', 'code_type',
 
     def save_formset(self, request, form, formset, change):
         """Автоматическое заполнение поля user в инлайнах."""
@@ -179,30 +184,30 @@ class GeoObjectCodeAdmin(BaseAdmin):
         formset.save_m2m()  # Сохраняем связи many-to-many, если они есть
 
 
-class GeoObjectMapInline(admin.TabularInline):
-    """Инлайн для управления связями между GeoObjectCode и GeoObject с дополнительным полем code_name."""
+class ObjectMapInline(admin.TabularInline):
+    """Инлайн для управления связями между ObjectCode и Object с дополнительным полем code_name."""
 
-    model = GeoObjectMapSub
+    model = ObjectMapSub
     extra = 1
-    autocomplete_fields = 'geo_object',
+    autocomplete_fields = 'object',
 
 
-@admin.register(GeoObjectMap)
-class GeoObjectMapAdmin(BaseAdmin):
-    """Админка для GeoObjectMap."""
+@admin.register(ObjectMap)
+class ObjectMapAdmin(BaseAdmin):
+    """Админка для ObjectMap."""
 
-    inlines = [GeoObjectMapInline]
+    inlines = [ObjectMapInline]
 
-    list_display = 'main',
-    list_display_links = 'main',
-    search_fields = 'main__object_name', 'sub_objects__code_type__map_type',
-    autocomplete_fields = 'main',
+    list_display = 'geo',
+    list_display_links = 'geo',
+    search_fields = 'geo__object_name', 'sub_objects__code_type__map_type',
+    autocomplete_fields = 'geo',
 
     def get_search_results(self, request, queryset, search_term):
-        """Фильтруем результаты поиска для поля main."""
+        """Фильтруем результаты поиска для поля geo."""
         queryset, use_distinct = super().get_search_results(request, queryset, search_term)
 
         # Фильтруем только те объекты, у которых is_active = True
-        queryset = queryset.filter(main__is_active=True)
+        queryset = queryset.filter(geo__is_active=True)
 
         return queryset, use_distinct

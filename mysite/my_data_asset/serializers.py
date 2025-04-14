@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import (
     DataAsset,
     DataAssetType,
-    DataAssetStatus,
+    DataAssetStatus, AssetStat,
 )
 
 
@@ -57,3 +57,11 @@ class DataAssetSerializer(serializers.ModelSerializer):
             representation.pop('port', None)
 
         return representation
+
+
+class AssetStatSerializer(serializers.ModelSerializer):
+    """Статистика источника данных."""
+
+    class Meta:
+        model = AssetStat
+        fields = '__all__'

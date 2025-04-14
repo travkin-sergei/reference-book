@@ -10,8 +10,8 @@
                     <thead>
                     <tr>
                         <th scope="col">
-                            <label for="id_object_code">Основной объект</label><br>
-                            {{ filter.form.object_code }}
+                            <label for="geo_id">Основной объект</label><br>
+                            {{ filter.form.geo_id }}
                         </th>
                         <th scope="col">
                             <div class="d-flex justify-content-between align-items-center">
@@ -30,12 +30,12 @@
                     {% for i_object in geo_objects %}
                     <tr>
                         <td>
-                            <a href="{% url 'my_geo_id:geo-detail' i_object.object_code %}">
-                                {{ i_object.object_code }}
+                            <a href="{% url 'my_geo_id:geo-detail' i_object.geo_id %}">
+                                {{ i_object.geo_id }}
                             </a>
                         </td>
                         <td>
-                            <a href="{% url 'my_geo_id:geo-detail' i_object.object_code %}">
+                            <a href="{% url 'my_geo_id:geo-detail' i_object.geo_id %}">
                                 {{ i_object.object_name }}
                             </a>
                         </td>

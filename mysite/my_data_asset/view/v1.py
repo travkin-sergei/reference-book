@@ -2,8 +2,8 @@ from rest_framework import permissions
 from rest_framework.viewsets import ModelViewSet
 from drf_spectacular.utils import extend_schema
 
-from ..models import DataAsset
-from ..serializers import DataAssetSerializer
+from ..models import DataAsset, AssetStat
+from ..serializers import DataAssetSerializer, AssetStatSerializer
 
 
 @extend_schema(
@@ -86,3 +86,56 @@ class DataAssetAPIViewSet(ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         self.check_permissions(request)  # Проверка разрешений
         return super().destroy(request, *args, **kwargs)
+
+
+@extend_schema(
+    tags=["Data asset"],
+    summary="DataAssetAPIViewSet",
+    description=(
+            """
+            Обработка источников данных.
+            """
+    ),
+)
+class DataAssetAPIViewSet(ModelViewSet):
+    queryset = AssetStat.objects.all()
+    serializer_class = AssetStatSerializer
+
+    @extend_schema(
+        summary="Список источников данных",
+        description="Извлечение списка источников данных",
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @extend_schema(
+        summary="Создание новый ресурс данных",
+    )
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+    @extend_schema(
+        summary="Извлечение определенного источника данных",
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    @extend_schema(
+        summary="Обновление определенного источника данных",
+    )
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
+    @extend_schema(
+        summary="Удаление определенного источника данных",
+    )
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
+    @extend_schema(
+        summary="Частичное обновление определенного источника данных",
+        description="Частичное обновление определенного источника данных по его ID. Укажите только те поля, которые хотите обновить.",
+        request=AssetStatSerializer,
+        responses={200: AssetStatSerializer},
+    )
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)

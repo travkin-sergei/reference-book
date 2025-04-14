@@ -15,7 +15,7 @@ urlpatterns = [
     path('api/v1/swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger'),
     path('api/v1/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 
-    path('data-asset/', include('my_data_asset.urls')),  # Приложение Источники данных
+    path('asset/', include('my_data_asset.urls')),  # Приложение Источники данных
     path('', include('my_geo_id.urls')),  # Приложение GEO-ID
 
 ]

@@ -41,12 +41,12 @@
                 <tbody>
                 {% for i_obj in object_list %}
                 <tr>
-                    <td><a href="{% url 'my_data_asset:data-asset-detail' i_obj.id %}">{{ i_obj.uir }}</a></td>
+                    <td><a href="{% url 'my_data_asset:data-asset-detail' i_obj.pk %}">{{ i_obj.uir }}</a></td>
                     <td><a href="{{ i_obj.url }}" target="_blank">{{ i_obj.url }}</a></td>
-                    <td><a href="{% url 'my_data_asset:data-asset-detail' i_obj.id %}">{{ i_obj.name }}</a></td>
+                    <td><a href="{% url 'my_data_asset:data-asset-detail' i_obj.pk %}">{{ i_obj.name }}</a></td>
                     {% if user.is_superuser %}
-                    <td><a href="{% url 'my_data_asset:data-asset-detail' i_obj.id %}">{{ i_obj.host }}</a></td>
-                    <td><a href="{% url 'my_data_asset:data-asset-detail' i_obj.id %}">{{ i_obj.port }}</a></td>
+                    <td><a href="{% url 'my_data_asset:data-asset-detail' i_obj.pk %}">{{ i_obj.host }}</a></td>
+                    <td><a href="{% url 'my_data_asset:data-asset-detail' i_obj.pk %}">{{ i_obj.port }}</a></td>
                     {% endif %}
                 </tr>
                 {% empty %}

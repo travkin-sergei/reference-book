@@ -1,39 +1,62 @@
 from django.contrib import admin
 
-
 from .models import (
     DataAsset, DataAssetType, DataAssetStatus,
     DataModel,
     DataTable,
     DataValue,
-    DataAssetGroup, DataAssetGroupAsset,
+    DataAssetGroup, DataAssetGroupAsset, AssetStat,
 )
+
+class BaseAdmin(admin.ModelAdmin):
+    readonly_fields = ('created_at', 'updated_at')
+
+    def get_readonly_fields(self, request, obj=None):
+        # Если объект уже существует, делаем поля readonly
+        if obj:
+            return self.readonly_fields
+        return self.readonly_fields
+
 
 
 @admin.register(DataAssetType)
-class DataAssetTypeAdmin(admin.ModelAdmin):
+class DataAssetTypeAdmin(BaseAdmin):
     list_display = 'name',
     list_display_links = 'name',
     search_fields = 'name',
 
 
 @admin.register(DataAssetStatus)
-class DataAssetStatusAdmin(admin.ModelAdmin):
+class DataAssetStatusAdmin(BaseAdmin):
     list_display = 'name',
     list_display_links = 'name',
     search_fields = 'name',
 
 
 @admin.register(DataAsset)
-class DataAssetAdmin(admin.ModelAdmin):
+class DataAssetAdmin(BaseAdmin):
     list_display = 'created_at', 'name', 'is_active', 'hash_address',
     list_display_links = 'created_at', 'name', 'is_active', 'hash_address',
     search_fields = 'hash_address', 'name',
-    autocomplete_fields = 'type', 'status',
+    autocomplete_fields = 'type',
+
+
+@admin.register(AssetStat)
+class AssetStatAdmin(BaseAdmin):
+    list_display = 'get_uir', 'date_last', 'row_last', 'row_actual', 'version', 'control_1', 'control_2',
+    list_display_links = 'get_uir', 'date_last',
+    search_fields = 'uir__uir', 'version',
+    autocomplete_fields = 'uir',
+
+    def get_uir(self, obj):
+        return obj.uir.uir
+    get_uir.short_description = 'УИР'
+
+
 
 
 @admin.register(DataModel)
-class DataModelAdmin(admin.ModelAdmin):
+class DataModelAdmin(BaseAdmin):
     list_display = 'created_at', 'name', 'is_active', 'hash_address',
     list_display_links = 'created_at', 'name', 'is_active', 'hash_address',
     search_fields = 'hash_address', 'data_asset__name', 'name',
@@ -54,7 +77,7 @@ class DataValueInline(admin.TabularInline):
 
 
 @admin.register(DataTable)
-class DataTableAdmin(admin.ModelAdmin):
+class DataTableAdmin(BaseAdmin):
     """
     Заполнение таблицы данных и данных о столбцах этой таблице.
     inlines к DataValueInline:
@@ -71,7 +94,7 @@ class DataTableAdmin(admin.ModelAdmin):
 
 # 04 Значения таблицы
 @admin.register(DataValue)
-class DataValueAdmin(admin.ModelAdmin):
+class DataValueAdmin(BaseAdmin):
     list_display = 'updated_at', 'is_active', 'hash_address', 'data_table', 'name',
     list_display_links = 'updated_at', 'is_active', 'hash_address',
     search_fields = 'hash_address', 'name', 'data_table__name', 'name',
@@ -80,7 +103,7 @@ class DataValueAdmin(admin.ModelAdmin):
 
 # =============================================== Группировки источников ===============================================
 @admin.register(DataAssetGroup)
-class DataAssetGroupsAdmin(admin.ModelAdmin):
+class DataAssetGroupsAdmin(BaseAdmin):
     """Отображение группировок Моделей данных"""
 
     list_display = 'is_active', 'name',  # 'data_asset_group_verbose',
@@ -90,7 +113,7 @@ class DataAssetGroupsAdmin(admin.ModelAdmin):
 
 
 @admin.register(DataAssetGroupAsset)
-class DataAssetGroupAssetAdmin(admin.ModelAdmin):
+class DataAssetGroupAssetAdmin(BaseAdmin):
     """Отображение группировок Моделей данных"""
 
     list_display = 'created_at', 'name', 'data_assets',

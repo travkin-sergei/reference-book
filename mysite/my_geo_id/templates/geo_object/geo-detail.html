@@ -24,7 +24,7 @@
             <div class="card mb-2">
                 <div class="card-body">
                     <h5 class="card-title">Основная информация</h5>
-                    <p class="card-text"><strong>Уникальный код:</strong> {{ geo_objects_detail.object_code }}</p>
+                    <p class="card-text"><strong>Уникальный код:</strong> {{ geo_objects_detail.geo_id }}</p>
                     <p class="card-text"><strong>Дата основания:</strong> {{ geo_objects_detail.date_start|default:"" }}
                     </p>
                     <p class="card-text"><strong>Дата ликвидации:</strong> {{ geo_objects_detail.date_stop|default:"" }}
@@ -42,9 +42,9 @@
             <h2 class="mt-4">Дополнительная информация:</h2>
             <div class="card mb-4">
                 <div class="card-body">
-                    {% if geo_info %}
+                    {% if info %}
                     <p class="card-text"><strong>Площадь территории:</strong>
-                        {{ geo_info.area|default:"Данных нет." }} кв. км
+                        {{ info.area|default:"Данных нет." }} кв. км
                     </p>
                     {% else %}
                     <p class="card-text">Дополнительная информация отсутствует.</p>

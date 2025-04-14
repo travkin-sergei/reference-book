@@ -1,19 +1,21 @@
 from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.views.generic import ListView, TemplateView, DetailView
+from django.db.models import Q  # Импортируем Q для сложных запросов
 
 from ..filters import (
-    GeoObjectFilter,
-    GeoObjectCodeFilter,
-    GeoObjectMapFilter,
+    ObjectFilter,
+    ObjectCodeFilter,
+    ObjectMapFilter,
 )
 from ..models import (
-    GeoObject,
-    GeoObjectCode, GeoObjectCodeSub,  # Справочники
-    GeoObjectMap, GeoObjectMapSub, GeoNames, GeoInfo, MapLocation,  # Группировки
+    Object,
+    ObjectCode, ObjectCodeSub,  # Справочники
+    ObjectMap, ObjectMapSub, Synonym, Info, MapLocation,  # Группировки
 )
 
 
+# Synonym
 # О приложении
 class AboutAppView(TemplateView):
     """
@@ -31,21 +33,21 @@ class AboutAppView(TemplateView):
 class GeoInfoListView(ListView):
     """Отображение списка геообъектов с дополнительной информацией."""
 
-    model = GeoInfo
+    model = Info
     template_name = 'geo_object/map_all.html'
     context_object_name = 'geo_info_list'
 
     def get_queryset(self):
         """Фильтруем активные геообъекты."""
-        result = GeoInfo.objects.filter(is_active=True)
+        result = Info.objects.filter(is_active=True)
         return result
 
 
 # Список объектов
-class GeoObjectView(ListView):
+class ObjectView(ListView):
     """Список геообъектов."""
 
-    queryset = (GeoObject.objects.filter(is_active=True))
+    queryset = (Object.objects.filter(is_active=True))
     template_name = "geo_object/geo.html"
     context_object_name = 'geo_objects'
     paginate_by = 20
@@ -53,7 +55,7 @@ class GeoObjectView(ListView):
     def get_queryset(self):
         """Фильтруем queryset на основе параметров запроса."""
         queryset = super().get_queryset()
-        self.filter = GeoObjectFilter(self.request.GET, queryset=queryset)  # Инициализируем фильтр
+        self.filter = ObjectFilter(self.request.GET, queryset=queryset)  # Инициализируем фильтр
         return self.filter.qs
 
     def get_context_data(self, **kwargs):
@@ -63,31 +65,28 @@ class GeoObjectView(ListView):
         return context
 
 
-class GeoObjectDetailView(DetailView):
+class ObjectDetailView(DetailView):
     """Список геообъектов."""
 
-    queryset = (GeoObject.objects.filter(is_active=True))
+    queryset = (Object.objects.filter(is_active=True))
     template_name = "geo_object/geo-detail.html"
     context_object_name = 'geo_objects_detail'
     paginate_by = 20
 
     def get_context_data(self, **kwargs):
-        """Добавляем связанные GeoNames в контекст."""
+        """Добавляем связанные Synonym в контекст."""
         context = super().get_context_data(**kwargs)
-        geo_object = self.object  # Получаем текущий объект GeoObject
-        context['geo_names'] = geo_object.geo_name.all()  # Получаем все связанные GeoNames
-        context['geo_info'] = geo_object.geo_info  # Получаем все связанные GeoNames
+        geo_object = self.object  # Получаем текущий объект Object
+        context['names'] = geo_object.name.all()  # Получаем все связанные Synonym
+        context['info'] = geo_object.info  # Получаем все связанные Synonym
         return context
 
 
 # Справочники
-class GeoObjectCodeView(ListView):
-    """Представление для отображения списка GeoObjectCode."""
+class ObjectCodeView(ListView):
+    """Представление для отображения списка ObjectCode."""
 
-    queryset = (
-        GeoObjectCode
-        .objects.filter(is_active=True)
-    )
+    queryset = ObjectCode.objects.filter(is_active=True)
     template_name = 'geo_object/country-list.html'
     context_object_name = 'geo_object_code'
     paginate_by = 20
@@ -95,7 +94,7 @@ class GeoObjectCodeView(ListView):
     def get_queryset(self):
         """Фильтруем queryset на основе параметров запроса."""
         queryset = super().get_queryset()
-        self.filter = GeoObjectCodeFilter(self.request.GET, queryset=queryset)
+        self.filter = ObjectCodeFilter(self.request.GET, queryset=queryset)
         return self.filter.qs
 
     def get_context_data(self, **kwargs):
@@ -106,7 +105,7 @@ class GeoObjectCodeView(ListView):
 
 
 # Справочники
-class GeoObjectCodeDetailView(DetailView):
+class ObjectCodeDetailView(DetailView):
     """
     Представление для отображения деталей кода геообъекта.
     1) Значания в рамках справочника долны быть разделены на:
@@ -115,7 +114,7 @@ class GeoObjectCodeDetailView(DetailView):
     """
 
     queryset = (
-        GeoObjectCode
+        ObjectCode
         .objects
         .filter(is_active=True)
     )
@@ -127,7 +126,7 @@ class GeoObjectCodeDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         # Получаем связанные объекты из промежуточной модели
         related_objects = (
-            GeoObjectCodeSub
+            ObjectCodeSub
             .objects.filter(geo_object_code=self.object)
             .order_by("is_group")  # 1.1.
         )
@@ -142,17 +141,17 @@ class GeoObjectCodeDetailView(DetailView):
 
 
 # Группировки
-class GeoObjectMapView(ListView):
-    """Представление для отображения списка GeoObjectCode."""
+class ObjectMapView(ListView):
+    """Представление для отображения списка ObjectCode."""
 
-    queryset = GeoObjectMap.objects.filter(is_active=True)
+    queryset = ObjectMap.objects.filter(is_active=True)
     template_name = 'geo_object/geo-map.html'
     context_object_name = 'geo_object_map'
 
     def get_queryset(self):
         """Фильтруем queryset на основе параметров запроса."""
         queryset = super().get_queryset()
-        self.filter = GeoObjectMapFilter(self.request.GET, queryset=queryset)
+        self.filter = ObjectMapFilter(self.request.GET, queryset=queryset)
         return self.filter.qs
 
     def get_context_data(self, **kwargs):
@@ -163,10 +162,10 @@ class GeoObjectMapView(ListView):
 
 
 # Группировки
-class GeoObjectMapDetailView(DetailView):
-    """Представление для отображения деталей GeoObjectMap."""
+class ObjectMapDetailView(DetailView):
+    """Представление для отображения деталей ObjectMap."""
 
-    model = GeoObjectMap  # Указываем модель, для которой будет отображаться детальная информация
+    model = ObjectMap  # Указываем модель, для которой будет отображаться детальная информация
     template_name = 'geo_object/geo-map-detail.html'  # Шаблон для отображения деталей
     context_object_name = 'geo_object_map'  # Имя контекста для доступа к объекту в шаблоне
 
@@ -180,15 +179,15 @@ class GeoObjectMapDetailView(DetailView):
 
         context = super().get_context_data(**kwargs)
 
-        geo_object_map = self.object  # Получаем текущий объект GeoObjectMap
+        geo_object_map = self.object  # Получаем текущий объект ObjectMap
         related_objects = geo_object_map.sub_objects.all()  # Получаем связанные объекты, если они есть
         context['related_objects'] = related_objects if related_objects.exists() else None
         return context
 
 
-class GeoNamesTView(ListView):
+class SynonymTView(ListView):
     queryset = (
-        GeoNames
+        Synonym
         .objects.filter(is_active=True)
     )
     context_object_name = 'geo_name'
@@ -196,30 +195,36 @@ class GeoNamesTView(ListView):
     paginate_by = 20
 
 
-class GetGeoIdForGeoNames(ListView):
+class GetGeoIdForSynonym(ListView):
     """Поисковик по синонимам, для поиска GEO-ID"""
 
-    model = GeoObject
+    model = Object
     context_object_name = 'geo_objects'
     template_name = "geo_object/geo-id-search.html"
     paginate_by = 20
 
     def get_queryset(self):
         # Получаем имя из GET-параметров
-        self.geo_name = self.request.GET.get('name', None)
-        if self.geo_name:
-            self.geo_name = self.geo_name.strip()
-            # Фильтруем объекты GeoObject по имени GeoNames
-            return GeoObject.objects.filter(
-                geo_name__name__icontains=self.geo_name,  # Используем icontains для нечувствительного к регистру поиска
+        self.name = self.request.GET.get('name', None)
+        if self.name:
+            self.name = self.name.strip()
+            # Ищем синонимы по имени
+            synonyms = Synonym.objects.filter(
+                name__icontains=self.name
+            ).values_list('geo_id', flat=True)  # Получаем geo_id из найденных синонимов
+
+            # Теперь ищем объекты Object по найденным geo_id
+            return Object.objects.filter(
+                object_code__in=synonyms,  # Предполагается, что geo_id соответствует object_code
                 is_active=True
-            ).prefetch_related('geo_name')
+            ).prefetch_related('name')
+
         # Возвращаем пустой queryset, если имя не указано
-        return GeoObject.objects.none()
+        return Object.objects.none()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['geo_name'] = self.geo_name
+        context['name'] = self.name
         return context
 
 

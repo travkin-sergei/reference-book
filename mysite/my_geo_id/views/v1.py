@@ -4,20 +4,21 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework import status
 
+from ..models import Synonym
 from ..serializers import *
 
 tags = ["GEO-ID", ]
 
 
-@extend_schema(tags=["geo_object"], summary="GeoNamesViewSet", description=("""Названия."""), )
-class GeoNamesViewSet(ModelViewSet):
+@extend_schema(tags=["object"], summary="SynonymViewSet", description=("""Названия."""), )
+class SynonymViewSet(ModelViewSet):
     """
     Получить список всех DataAssetAPIViewSet.
     1) Запросы 'POST','PUT','PATCH','DELETE' - требуем авторизацию!!!
     """
 
-    queryset = GeoNames.objects.all()
-    serializer_class = GeoNamesSerializer
+    queryset = Synonym.objects.all()
+    serializer_class = SynonymSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_permissions(self):
@@ -83,15 +84,15 @@ class GeoNamesViewSet(ModelViewSet):
         return super().destroy(request, *args, **kwargs)
 
 
-@extend_schema(tags=["geo_object_sub"], summary="GeoObjectMapSubViewSet", description=("""Описание."""), )
-class GeoObjectMapSubViewSet(ModelViewSet):
+@extend_schema(tags=["object_sub"], summary="ObjectMapSubViewSet", description=("""Описание."""), )
+class ObjectMapSubViewSet(ModelViewSet):
     """
-    Получить список всех GeoObjectMapSub.
+    Получить список всех ObjectMapSub.
     1) Запросы 'POST','PUT','PATCH','DELETE' - требуем авторизацию!!!
     """
 
-    queryset = GeoObjectMapSub.objects.all()
-    serializer_class = GeoObjectMapSubSerializer
+    queryset = ObjectMapSub.objects.all()
+    serializer_class = ObjectMapSubSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_permissions(self):
@@ -103,16 +104,16 @@ class GeoObjectMapSubViewSet(ModelViewSet):
         return super().get_permissions()
 
     @extend_schema(
-        summary='Список GeoObjectMapSub',
-        description='Получить список всех GeoObjectMapSub.',
+        summary='Список ObjectMapSub',
+        description='Получить список всех ObjectMapSub.',
         tags=["geo_object_sub"],
     )
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
     @extend_schema(
-        summary='Создать GeoObjectMapSub',
-        description='Создать новый объект GeoObjectMapSub.',
+        summary='Создать ObjectMapSub',
+        description='Создать новый объект ObjectMapSub.',
         tags=["geo_object_sub"],
     )
     def create(self, request, *args, **kwargs):
@@ -120,16 +121,16 @@ class GeoObjectMapSubViewSet(ModelViewSet):
         return super().create(request, *args, **kwargs)
 
     @extend_schema(
-        summary='Получить GeoObjectMapSub',
-        description='Получить объект GeoObjectMapSub по ID.',
+        summary='Получить ObjectMapSub',
+        description='Получить объект ObjectMapSub по ID.',
         tags=["geo_object_sub"],
     )
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
 
     @extend_schema(
-        summary='Обновить GeoObjectMapSub',
-        description='Обновить объект GeoObjectMapSub по ID.',
+        summary='Обновить ObjectMapSub',
+        description='Обновить объект ObjectMapSub по ID.',
         tags=["geo_object_sub"],
     )
     def update(self, request, *args, **kwargs):
@@ -137,8 +138,8 @@ class GeoObjectMapSubViewSet(ModelViewSet):
         return super().update(request, *args, **kwargs)
 
     @extend_schema(
-        summary='Частичное обновление GeoObjectMapSub',
-        description='Частично обновить объект GeoObjectMapSub по ID.',
+        summary='Частичное обновление ObjectMapSub',
+        description='Частично обновить объект ObjectMapSub по ID.',
         tags=["geo_object_sub"],
     )
     def partial_update(self, request, *args, **kwargs):
@@ -146,8 +147,8 @@ class GeoObjectMapSubViewSet(ModelViewSet):
         return super().partial_update(request, *args, **kwargs)
 
     @extend_schema(
-        summary='Удалить GeoObjectMapSub',
-        description='Удалить объект GeoObjectMapSub по ID.',
+        summary='Удалить ObjectMapSub',
+        description='Удалить объект ObjectMapSub по ID.',
         tags=["geo_object_sub"],
     )
     def destroy(self, request, *args, **kwargs):
@@ -155,7 +156,7 @@ class GeoObjectMapSubViewSet(ModelViewSet):
         return super().destroy(request, *args, **kwargs)
 
 
-class GeoObjectSearchView(ModelViewSet):
-    queryset = GeoObject.objects.all()
-    serializer_class = GeoObjectSerializer
+class ObjectSearchView(ModelViewSet):
+    queryset = Object.objects.all()
+    serializer_class = ObjectSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]

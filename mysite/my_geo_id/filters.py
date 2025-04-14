@@ -1,13 +1,13 @@
 import django_filters
 from .models import (
-    GeoObject,
-    GeoObjectCode,
-    GeoObjectMap,
+    Object,
+    ObjectCode,
+    ObjectMap,
 )
 
 
-class GeoObjectFilter(django_filters.FilterSet):
-    """Фильтрация GeoObject."""
+class ObjectFilter(django_filters.FilterSet):
+    """Фильтрация Object."""
 
     object_code = django_filters.CharFilter(
         field_name='object_code', lookup_expr='icontains', label='geo-id'
@@ -17,26 +17,26 @@ class GeoObjectFilter(django_filters.FilterSet):
     )
 
     class Meta:
-        model = GeoObject
+        model = Object
         fields = 'object_code', 'object_name',
 
 
-class GeoObjectCodeFilter(django_filters.FilterSet):
-    """Фильтрация GeoObjectCode."""
+class ObjectCodeFilter(django_filters.FilterSet):
+    """Фильтрация ObjectCode."""
 
     main = django_filters.CharFilter(field_name='main__object_name', lookup_expr='icontains', label='Основной объект')
     code_type = django_filters.CharFilter(field_name='code_type__code_type', lookup_expr='icontains', label='Тип кода')
 
     class Meta:
-        model = GeoObjectCode
+        model = ObjectCode
         fields = 'main', 'code_type',
 
 
-class GeoObjectMapFilter(django_filters.FilterSet):
-    """Фильтрация GeoObjectMap."""
+class ObjectMapFilter(django_filters.FilterSet):
+    """Фильтрация ObjectMap."""
 
     main = django_filters.CharFilter(field_name='main__object_name', lookup_expr='icontains', label='Основной объект')
 
     class Meta:
-        model = GeoObjectMap
+        model = ObjectMap
         fields = 'main',

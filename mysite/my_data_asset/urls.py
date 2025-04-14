@@ -7,6 +7,7 @@ from .view.web import (
     DataModelView, DataModelDetailView,
     DataTableView, DataTableDetailView,
     DataAssetGroupsView, DataAssetGroupsDetailView,
+    AssetStatListView, AssetStatDetailView,
 )
 
 app_name = 'my_data_asset'
@@ -21,15 +22,18 @@ urlpatterns = [
     # WEB
     path('', AboutAppView.as_view(), name='about-app'),
     # Источники данных
-    path('data-assets/', DataAssetView.as_view(), name='data-asset'),
-    path('data-assets/<int:pk>/', DataAssetDetailView.as_view(), name='data-asset-detail'),
+    path('assets/', DataAssetView.as_view(), name='data-asset'),
+    path('assets/<str:pk>/', DataAssetDetailView.as_view(), name='data-asset-detail'),
+    # Статистика источников данных
+    path('stat/', AssetStatListView.as_view(), name='asset-stat'),
+    path('stat/<int:pk>/', AssetStatDetailView.as_view(), name='asset-stat-detail'),
     # Модели источников данных
-    path('data-model/', DataModelView.as_view(), name='data-model'),
-    path('data-model/<int:pk>/', DataModelDetailView.as_view(), name='data-model-detail'),
+    path('model/', DataModelView.as_view(), name='data-model'),
+    path('model/<int:pk>/', DataModelDetailView.as_view(), name='data-model-detail'),
     # Модели таблиц данных
-    path('data-table/', DataTableView.as_view(), name='data-table'),
-    path('data-table/<int:pk>/', DataTableDetailView.as_view(), name='data-table-detail'),
+    path('table/', DataTableView.as_view(), name='data-table'),
+    path('table/<int:pk>/', DataTableDetailView.as_view(), name='data-table-detail'),
     # Группировка источников данных
-    path('data-assets-groups/', DataAssetGroupsView.as_view(), name='data-asset-groups'),
-    path('data-assets-groups/<int:pk>/', DataAssetGroupsDetailView.as_view(), name='data-asset-groups-detail'),
+    path('assets-groups/', DataAssetGroupsView.as_view(), name='data-asset-groups'),
+    path('assets-groups/<int:pk>/', DataAssetGroupsDetailView.as_view(), name='data-asset-groups-detail'),
 ]

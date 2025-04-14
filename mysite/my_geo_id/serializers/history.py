@@ -1,30 +1,30 @@
 from rest_framework import serializers
 
 from ..models import (
-    GeoObject,
-    GeoObjectMap,
+    Object,
+    ObjectMap,
 )
 
 
-class GeoObjectHistorySerializer(serializers.ModelSerializer):
+class ObjectHistorySerializer(serializers.ModelSerializer):
     """
-    Получения исторических записей Геообъекта(GeoObject)
+    Получения исторических записей Геообъекта(Object)
     """
 
     class Meta:
-        model = GeoObject.history.model
+        model = Object.history.model
         fields = "is_active", "object_code", "object_name",
 
 
-class GeoObjectMapHistorySerializer(serializers.ModelSerializer):
+class ObjectMapHistorySerializer(serializers.ModelSerializer):
     """
-    Получения исторических записей связей геообъекта(GeoObjectMap)
+    Получения исторических записей связей геообъекта(ObjectMap)
     """
     # main_name = serializers.CharField(source='main.object_name', read_only=True)
     # sub_name = serializers.CharField(source='sub.object_name', read_only=True)
     # map_type = serializers.StringRelatedField(read_only=True)
 
     class Meta:
-        model = GeoObjectMap.history.model
+        model = ObjectMap.history.model
         fields = "is_active", "main", "sub",
         # fields = ['main', 'main_name', 'sub', 'sub_name', 'map_type']

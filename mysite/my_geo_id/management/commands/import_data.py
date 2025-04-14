@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.core.serializers import deserialize
-from ...models import GeoNames
+from ...models import Synonym
 import logging
 
 logger = logging.getLogger(__name__)
@@ -20,7 +20,7 @@ class Command(BaseCommand):
         to_create = []
 
         # Получаем существующие записи (GeoNames использует name как primary_key)
-        existing_records = {obj.name: obj for obj in GeoNames.objects.all()}
+        existing_records = {obj.name: obj for obj in Synonym.objects.all()}
 
         for obj in objects:
             new_obj = obj.object  # Десериализованный объект
@@ -48,11 +48,11 @@ class Command(BaseCommand):
                 to_create.append(new_obj)
 
         # Массово создаём новые записи
-        GeoNames.objects.bulk_create(to_create, ignore_conflicts=True)
+        Synonym.objects.bulk_create(to_create, ignore_conflicts=True)
 
         # Массово обновляем существующие записи (django-simple-history сохранит изменения автоматически)
         fields_to_update = ["language", "date_start", "date_stop"]
-        GeoNames.objects.bulk_update(to_update, fields_to_update)
+        Synonym.objects.bulk_update(to_update, fields_to_update)
 
         self.stdout.write(
             self.style.SUCCESS(

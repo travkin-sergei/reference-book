@@ -6,6 +6,7 @@ from simple_history.models import HistoricalRecords
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import DateField
+from django.db.models.functions import Now
 
 db_schema = 'my_geo_id'
 
@@ -25,27 +26,27 @@ def generate_unique_code(length=6):
 class BaseModel(models.Model):
     """Базовый класс модели. Сюда вынесены все системные поля."""
 
-    creation_at = models.DateTimeField(
-        auto_now_add=True
+    created_at = models.DateTimeField(
+        db_default=Now()
         , verbose_name='Создано'
         , help_text="Создано"
 
     )
-    update_at = models.DateTimeField(
-        auto_now=True
+    updated_at = models.DateTimeField(
+        db_default=Now()
         , verbose_name='Обновлено'
         , help_text="Обновлено"
 
+    )
+    is_active = models.BooleanField(
+        db_default=True
+        , verbose_name='Запись активна?'
+        , help_text="Запись активна?"
     )
     user = models.ForeignKey(
         User, on_delete=models.CASCADE
         , verbose_name='Автор'
         , help_text="Автор"
-    )
-    is_active = models.BooleanField(
-        default=True
-        , verbose_name='Запись активна?'
-        , help_text="Запись активна?"
     )
     task = models.URLField(
         verbose_name='Задача в Jira'
@@ -62,70 +63,58 @@ class Language(BaseModel):
 
     language = models.CharField(max_length=5, primary_key=True)
     name = models.CharField(max_length=255)
-    history = HistoricalRecords(table_name='geo_language_history')
+    history = HistoricalRecords(table_name=f'{db_schema}\".\"language_history')
 
     def __str__(self):
         return f'{self.name}'
 
     class Meta:
         managed = True
-        db_table = f'{db_schema}\".\"geo_language'
+        db_table = f'{db_schema}\".\"language'
         db_table_comment = '{"name":"Список языков","description":"список языков"}'
         verbose_name = '01 список языков'
         verbose_name_plural = '01 список языков'
 
 
-class GeoNames(BaseModel):
-    """"Варианты названий геообъектов."""
+class Synonym(BaseModel):
+    """Все варианты географических названий."""
 
+    geo = models.ForeignKey(
+        'Object', on_delete=models.CASCADE
+        , verbose_name='geo'
+        , help_text="Ссылка на объект"
+    )
+    language = models.ForeignKey(
+        'Language', on_delete=models.CASCADE
+        , verbose_name='язык'
+        , help_text="alfa-2 языка"
+    )
     name = models.CharField(
-        primary_key=True, max_length=255
+        max_length=255
         , verbose_name='наименование'
         , help_text="наименование"
     )
-    language = models.ForeignKey(
-        'Language',
-        related_name='names', on_delete=models.CASCADE
-        , verbose_name='язык'
-        , help_text="язык"
-    )
-    date_start = DateField(
-        null=True, blank=True
-        , verbose_name='Дата начала действия'
-        , help_text="Дата начала действия"
+    history = HistoricalRecords(table_name=f'{db_schema}\".\"synonym_history')
 
-    )
-    date_stop = DateField(
-        null=True, blank=True
-        , verbose_name='Дата прекращения действия'
-        , help_text="Дата прекращения действия"
-
-    )
-    history = HistoricalRecords(table_name='geo_names_history')
+    def __str__(self):
+        return f'{self.geo}-{self.language}-{self.name}'
 
     class Meta:
         managed = True
-        db_table = f'{db_schema}\".\"geo_names'
-        db_table_comment = (
-            '{'
-            '"name":"Название геобъекта",'
-            '"description":"Таблица создана для ведения списка уникальных геообъектов",'
-            '}'
-        )
-        verbose_name = '01.01 название геобъекта'
-        verbose_name_plural = '01.01 названия геобъектов'
-
-    def __str__(self):
-        return f'{self.language}-{self.name}'
+        db_table = f'{db_schema}\".\"synonym'
+        db_table_comment = '{"name":"Синонимы названий геообъектов",}'
+        verbose_name = '00 Синонимы геообъекта'
+        verbose_name_plural = '02 Синонимы геообъектов'
+        unique_together = ('geo', 'language', 'name',)  # Уникальность строки
 
 
-class GeoObject(BaseModel):
+class Object(BaseModel):
     """
     Список гео объектов с уникальными кодами
     Важно!!! иметь только один геобъект даже если у него разные названия
     """
 
-    object_code = models.CharField(
+    geo_id = models.CharField(
         primary_key=True, max_length=6
         , verbose_name='уникальный код гео объекта'
         , help_text="кода автогенерируемый в модели"
@@ -136,8 +125,8 @@ class GeoObject(BaseModel):
         , help_text="подтягивается из языковой модели"
 
     )
-    geo_name = models.ManyToManyField(
-        'GeoNames'
+    name = models.ManyToManyField(
+        'Synonym'
         , related_name='geo_objects'
         , verbose_name="Все варианты названий"
         , help_text="Все варианты названий"
@@ -151,31 +140,31 @@ class GeoObject(BaseModel):
         , verbose_name='дата прекращения действия',
     )
 
-    history = HistoricalRecords(table_name='geo_object_history')
+    history = HistoricalRecords(table_name=f'{db_schema}\".\"object_history')
 
     class Meta:
         managed = True
-        db_table = f'{db_schema}\".\"geo_object'
-        db_table_comment = '{"name":"Геообъекты","description":"Таблица создана для ведения списка уникальных геообъектов"}'
+        db_table = f'{db_schema}\".\"object'
+        db_table_comment = '{"name":"Геоо  бъекты","description":"Таблица создана для ведения списка уникальных геообъектов"}'
         verbose_name = '02 Геообъект'
         verbose_name_plural = '02 Геообъекты'
 
     def __str__(self):
-        return f'{self.object_code}-{self.object_name}'
+        return f'{self.geo_id}-{self.object_name}'
 
     def save(self, *args, **kwargs):
         # Генерируем уникальный код, если он не задан и объект новый
-        if not self.object_code and not self.pk:  # Проверяем, что объект новый
+        if not self.geo_id and not self.pk:  # Проверяем, что объект новый
             unique_code = generate_unique_code().lower()  # Генерируем уникальный код в нижнем регистре
             # Проверяем уникальность кода среди активных объектов
-            existing_codes = set(GeoObject.objects.filter(is_active=True).values_list('object_code', flat=True))
+            existing_codes = set(Object.objects.filter(is_active=True).values_list('geo_id', flat=True))
             while unique_code in existing_codes:
                 unique_code = generate_unique_code().lower()  # Генерируем новый код в нижнем регистре
-            self.object_code = unique_code
+            self.geo_id = unique_code
         super().save(*args, **kwargs)
 
 
-class GeoObjectMapType(BaseModel):
+class ObjectMapType(BaseModel):
     """Тип в группе объектов"""
 
     map_type = models.CharField(
@@ -183,134 +172,106 @@ class GeoObjectMapType(BaseModel):
         , verbose_name='Тип группировки'
         , help_text="Тип группировки"
     )
-    history = HistoricalRecords(table_name='geo_object_map_type_history')
+    history = HistoricalRecords(table_name=f'{db_schema}\".\"object_map_type_history')
 
     def __str__(self):
         return f'{self.map_type}'
 
     class Meta:
         managed = True
-        db_table = f'{db_schema}\".\"geo_object_map_type'
+        db_table = f'{db_schema}\".\"object_map_type'
         db_table_comment = '{"name":"тип связи гео объекта","description":""}'
         verbose_name = '04 тип связи гео'
         verbose_name_plural = '04 тип связи гео'
 
 
-class GeoObjectSynonym(BaseModel):
-    """Все варианты географических названий."""
-
-    geo = models.ForeignKey(
-        'GeoObject', on_delete=models.CASCADE
-        , help_text="Ссылка на объект"
-    )
-    language = models.ForeignKey(
-        'Language', on_delete=models.CASCADE
-        , help_text="alfa-2 языка"
-    )
-    name = models.CharField(
-        max_length=255
-        , help_text="Текст"
-    )
-
-    def __str__(self):
-        return f'{self.language}-{self.name}'
-
-    class Meta:
-        managed = True
-        db_table = f'{db_schema}\".\"geo_object_synonym'
-        db_table_comment = '{"name":"Синонимы названий геообъектов",}'
-        verbose_name = '00 Синонимы геообъекта'
-        verbose_name_plural = '02 Синонимы геообъектов'
-        unique_together = 'geo', 'language', 'name',
-
-
-class GeoObjectCodeType(BaseModel):
+class ObjectCodeType(BaseModel):
     """Типы кодификации."""
 
     code_type = models.CharField(max_length=255, )
-    history = HistoricalRecords(table_name='geo_object_code_type_history')
+    history = HistoricalRecords(table_name=f'{db_schema}\".\"object_code_type_history')
 
     def __str__(self):
         return f'{self.code_type}'
 
     class Meta:
         managed = True
-        db_table = f'{db_schema}\".\"geo_object_code_type'
+        db_table = f'{db_schema}\".\"object_code_type'
         verbose_name = '03 Тип кодов'
         verbose_name_plural = '03 Типы кодов'
 
 
-class GeoObjectCode(BaseModel):
+class ObjectCode(BaseModel):
     """Варианты кодов геообъектов."""
 
-    main = models.ForeignKey('GeoObject', on_delete=models.CASCADE)
-    code_type = models.ForeignKey(GeoObjectCodeType, on_delete=models.CASCADE)
-    history = HistoricalRecords(table_name='geo_object_code_history')
+    geo = models.ForeignKey('Object', on_delete=models.CASCADE)
+    code_type = models.ForeignKey(ObjectCodeType, on_delete=models.CASCADE)
+    history = HistoricalRecords(table_name=f'{db_schema}\".\"object_code_history')
 
     def __str__(self):
-        return f'{self.main} - {self.code_type}'
+        return f'{self.geo} - {self.code_type}'
 
     class Meta:
         managed = True
-        db_table = f'{db_schema}\".\"geo_object_code'
-        ordering = ['main','-code_type']
+        db_table = f'{db_schema}\".\"code'
+        ordering = ['geo', '-code_type']
         verbose_name = '03.01 Справочник'
         verbose_name_plural = '03.01 Справочники'
 
 
-class GeoObjectCodeSub(models.Model):
-    """Промежуточная модель для связи GeoObjectCode и GeoObject с дополнительным полем code_name."""
+class ObjectCodeSub(models.Model):
+    """Промежуточная модель для связи ObjectCode и Object с дополнительным полем code_name."""
 
-    geo_object_code = models.ForeignKey(GeoObjectCode, on_delete=models.CASCADE, related_name='sub_objects')
-    geo_object = models.ForeignKey(GeoObject, on_delete=models.CASCADE)
-    name = models.ForeignKey(GeoNames, null=True, blank=True, on_delete=models.CASCADE)
+    object_code = models.ForeignKey(ObjectCode, on_delete=models.CASCADE, related_name='sub_objects')
+    object = models.ForeignKey(Object, on_delete=models.CASCADE)
+    name = models.ForeignKey(Synonym, null=True, blank=True, on_delete=models.CASCADE)
     code_name = models.CharField(max_length=255)
     is_group = models.BooleanField(
         default=False
         , db_comment='{'
-                     '"name":"это группа объектов текущегосправочника?."'
-                     '"description":"это группа объектов текущегосправочника?"'
+                     '"name":"это группа объектов текущего справочника?."'
+                     '"description":"это группа объектов текущего справочника?"'
                      '}'
-        , verbose_name='это группа объектов текущегосправочника?'
-        , help_text='это группа объектов текущегосправочника?'
+        , verbose_name='это группа объектов текущего справочника?'
+        , help_text='это группа объектов текущего справочника?'
     )
-    history = HistoricalRecords(table_name='geo_object_code_sub_history')
+    history = HistoricalRecords(table_name=f'{db_schema}\".\"object_code_sub_history')
 
     def __str__(self):
-        return f'{self.geo_object_code} - {self.geo_object} ({self.code_name})'
+        return f'{self.object_code} - {self.object} ({self.code_name})'
 
     class Meta:
         managed = True
-        db_table = f'{db_schema}\".\"geo_object_code_sub'
-        db_table_comment = '{"name":"geo_object_code_sub",}'
+        db_table = f'{db_schema}\".\"object_code_sub'
+        db_table_comment = '{"name":"object_code_sub",}'
         verbose_name = '03.02 Справочник'
         verbose_name_plural = '03.02 Справочники'
-        unique_together = 'geo_object_code', 'geo_object',
+        unique_together = 'object_code', 'object',
 
 
-class GeoObjectMap(BaseModel):
+class ObjectMap(BaseModel):
     """Группировки геообъектов."""
 
-    main = models.ForeignKey('GeoObject', on_delete=models.CASCADE)
+    geo = models.ForeignKey('Object', on_delete=models.CASCADE)
 
-    history = HistoricalRecords(table_name='geo_object_map_history')
+    history = HistoricalRecords(table_name=f'{db_schema}\".\"object_map_history')
 
     def __str__(self):
-        return f'{self.main}'
+        return f'{self.geo}'
 
     class Meta:
         managed = True
-        db_table = f'{db_schema}\".\"geo_object_map'
+        db_table = f'{db_schema}\".\"object_map'
         verbose_name = '04.01 Группировка'
         verbose_name_plural = '04.01 Группировка'
 
 
-class GeoObjectMapSub(models.Model):
-    """Промежуточная модель для связи GeoObjectCode и GeoObject с дополнительным полем code_name."""
+class ObjectMapSub(models.Model):
+    """Промежуточная модель для связи ObjectCode и Object с дополнительным полем code_name."""
 
-    geo_object_code = models.ForeignKey(GeoObjectMap, on_delete=models.CASCADE, related_name='sub_objects')
-    geo_object = models.ForeignKey(GeoObject, on_delete=models.CASCADE)
-    code_type = models.ForeignKey(GeoObjectMapType, on_delete=models.CASCADE)
+    object_code = models.ForeignKey(ObjectMap, on_delete=models.CASCADE, related_name='sub_objects')
+    object = models.ForeignKey(Object, on_delete=models.CASCADE)
+    code_type = models.ForeignKey(ObjectMapType, on_delete=models.CASCADE)
     date_start = DateField(
         null=True, blank=True
         , verbose_name='Дата начала действия',
@@ -319,28 +280,28 @@ class GeoObjectMapSub(models.Model):
         null=True, blank=True
         , verbose_name='дата прекращения действия',
     )
-    history = HistoricalRecords(table_name='geo_object_map_sub_history')
+    history = HistoricalRecords(table_name=f'{db_schema}\".\"object_map_sub_history')
 
     def __str__(self):
-        return f'{self.geo_object_code} - {self.geo_object}'
+        return f'{self.object_code} - {self.object}'
 
     class Meta:
         managed = True
-        db_table = f'{db_schema}\".\"geo_object_map_sub'
-        db_table_comment = '{"name":"geo_object_map_sub",}'
+        db_table = f'{db_schema}\".\"object_map_sub'
+        db_table_comment = '{"name":"object_map_sub",}'
         verbose_name = '04.02 Группировка'
         verbose_name_plural = '04.02 Группировка'
         # Уникальное ограничение для предотвращения дубликатов
-        unique_together = 'geo_object_code', 'geo_object',
+        unique_together = 'object_code', 'object',
 
 
-class GeoInfo(BaseModel):
+class Info(BaseModel):
     """Дополнительная информация об объекте."""
 
     geo = models.OneToOneField(
-        'GeoObject',
+        'Object',
         on_delete=models.CASCADE,
-        related_name='geo_info',
+        related_name='info',
         verbose_name='Геообъект'
     )
     area = models.FloatField(
@@ -357,7 +318,7 @@ class GeoInfo(BaseModel):
 
     class Meta:
         managed = True
-        db_table = f'{db_schema}\".\"geo_info'
+        db_table = f'{db_schema}\".\"info'
         verbose_name = 'Площадь территории'
         verbose_name_plural = 'Площадь территории'
 
