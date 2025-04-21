@@ -8,11 +8,10 @@
                 <thead>
                 <tr>
                     <th scope="col"><label for="id_uir">UIR</label><br>{{ filter.form.uir }}</th>
-                    <th>status</th>
+                    <th>period</th>
+                    <th>row period</th>
                     <th>date_last</th>
-                    <th>row_last</th>
-                    <th>row_actual</th>
-                    <th>version</th>
+                    <th>status</th>
                     <th>control_1</th>
                     <th>control_2</th>
                 </tr>
@@ -21,11 +20,10 @@
                 {% for i_obj in object_list %}
                 <tr>
                     <td><a href="{% url 'my_data_asset:asset-stat-detail' i_obj.pk %}">{{ i_obj.uir_id }}</a></td>
-                    <td><a href="{% url 'my_data_asset:asset-stat-detail' i_obj.pk %}">{{ i_obj.status }}</a></td>
+                    <td><a href="{% url 'my_data_asset:asset-stat-detail' i_obj.pk %}">{{ i_obj.period }}</a></td>
+                    <td><a href="{% url 'my_data_asset:asset-stat-detail' i_obj.pk %}">{{ i_obj.row_period }}</a></td>
                     <td><a href="{% url 'my_data_asset:asset-stat-detail' i_obj.pk %}">{{ i_obj.date_last }}</a></td>
-                    <td><a href="{% url 'my_data_asset:asset-stat-detail' i_obj.pk %}">{{ i_obj.row_last }}</a></td>
-                    <td><a href="{% url 'my_data_asset:asset-stat-detail' i_obj.pk %}">{{ i_obj.row_actual }}</a></td>
-                    <td><a href="{% url 'my_data_asset:asset-stat-detail' i_obj.pk %}">{{ i_obj.version }}</a></td>
+                    <td><a href="{% url 'my_data_asset:asset-stat-detail' i_obj.pk %}">{{ i_obj.status }}</a></td>
                     <td><a href="{% url 'my_data_asset:asset-stat-detail' i_obj.pk %}">{{ i_obj.control_1 }}</a></td>
                     <td><a href="{% url 'my_data_asset:asset-stat-detail' i_obj.pk %}">{{ i_obj.control_2 }}</a></td>
                 </tr>

@@ -1,12 +1,14 @@
 from django.contrib import admin
 
 from .models import (
-    DataAsset, DataAssetType, DataAssetStatus,
     DataModel,
     DataTable,
     DataValue,
-    DataAssetGroup, DataAssetGroupAsset, AssetStat,
+    AssetGroup, DataAssetGroupAsset,
+    AssetStat,
+    Asset, AssetType, AssetDomain, AssetDetails, AssetVersion,
 )
+
 
 class BaseAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at', 'updated_at')
@@ -18,41 +20,24 @@ class BaseAdmin(admin.ModelAdmin):
         return self.readonly_fields
 
 
-
-@admin.register(DataAssetType)
-class DataAssetTypeAdmin(BaseAdmin):
+@admin.register(AssetType)
+class AssetTypeAdmin(BaseAdmin):
     list_display = 'name',
     list_display_links = 'name',
     search_fields = 'name',
-
-
-@admin.register(DataAssetStatus)
-class DataAssetStatusAdmin(BaseAdmin):
-    list_display = 'name',
-    list_display_links = 'name',
-    search_fields = 'name',
-
-
-@admin.register(DataAsset)
-class DataAssetAdmin(BaseAdmin):
-    list_display = 'created_at', 'name', 'is_active', 'hash_address',
-    list_display_links = 'created_at', 'name', 'is_active', 'hash_address',
-    search_fields = 'hash_address', 'name',
-    autocomplete_fields = 'type',
 
 
 @admin.register(AssetStat)
 class AssetStatAdmin(BaseAdmin):
-    list_display = 'get_uir', 'date_last', 'row_last', 'row_actual', 'version', 'control_1', 'control_2',
+    list_display = 'get_uir', 'date_last', 'version', 'control_1', 'control_2',
     list_display_links = 'get_uir', 'date_last',
     search_fields = 'uir__uir', 'version',
     autocomplete_fields = 'uir',
 
     def get_uir(self, obj):
         return obj.uir.uir
+
     get_uir.short_description = 'УИР'
-
-
 
 
 @admin.register(DataModel)
@@ -102,8 +87,8 @@ class DataValueAdmin(BaseAdmin):
 
 
 # =============================================== Группировки источников ===============================================
-@admin.register(DataAssetGroup)
-class DataAssetGroupsAdmin(BaseAdmin):
+@admin.register(AssetGroup)
+class AssetGroupsAdmin(BaseAdmin):
     """Отображение группировок Моделей данных"""
 
     list_display = 'is_active', 'name',  # 'data_asset_group_verbose',
@@ -121,3 +106,58 @@ class DataAssetGroupAssetAdmin(BaseAdmin):
     search_fields = 'name__name', 'data_assets__name',
     autocomplete_fields = 'name', 'data_assets',
     list_editable = 'name', 'data_assets',
+
+
+class AssetTypeInline(admin.TabularInline):
+    model = AssetType
+    fields = 'name',  # Указываем только необходимые поля
+    extra = 1
+
+
+@admin.register(AssetDomain)
+class AssetDomainAdmin(BaseAdmin):
+    list_display = 'name',
+    list_display_links = 'name',
+    search_fields = 'name',
+
+
+class AssetDomainInline(admin.TabularInline):
+    model = AssetDomain
+    fields = 'name',  # Указываем только необходимые поля
+    extra = 1
+
+
+@admin.register(AssetDetails)
+class AssetDetailsAdmin(BaseAdmin):
+    list_display = 'name',
+    list_display_links = 'name',
+    search_fields = 'name',
+
+
+class AssetDetailsInline(admin.TabularInline):
+    model = AssetDetails
+    fields = 'name',  # Указываем только необходимые поля
+    extra = 1
+
+
+@admin.register(AssetVersion)
+class AssetVersionAdmin(BaseAdmin):
+    list_display = 'name',
+    list_display_links = 'name',
+    search_fields = 'name',
+
+
+class AssetVersionInline(admin.TabularInline):
+    model = AssetVersion
+    fields = 'name',  # Указываем только необходимые поля
+    extra = 1
+
+
+@admin.register(Asset)
+class AssetAdmin(BaseAdmin):
+    """Источник данных."""
+
+    list_display = 'type', 'domain', 'details', 'version', 'link', 'description',
+    list_display_links = 'type', 'domain', 'details', 'version',
+    search_fields = 'type__name', 'domain__name', 'details__name', 'version__name', 'link', 'description'
+    autocomplete_fields = 'type', 'domain', 'details', 'version',

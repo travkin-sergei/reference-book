@@ -8,51 +8,79 @@
                 <thead>
                 <tr>
                     <th scope="col">
-                        <label for="id_uir">UIR</label><br>
-                        {{ filter.form.uir }}
+                        UIR
                     </th>
                     <th scope="col">
-                        <label for="id_url">URL</label><br>
-                        {{ filter.form.url }}
+                        <label for="id_type">Тип</label><br>
+                        {{ filter.form.type }}
                     </th>
                     <th scope="col">
-                        <label for="id_name">Имя</label><br>
-                        {{ filter.form.name }}
-                    </th>
-                    {% if user.is_superuser %}
-                    <th scope="col">
-                        <label for="id_host">Host</label><br>
-                        {{ filter.form.host }}
+                        <label for="id_domain">Домен</label><br>
+                        {{ filter.form.domain }}
                     </th>
                     <th scope="col">
-                        <label for="id_port">Port</label><br>
+                        <label for="id_details">Детали</label><br>
+                        {{ filter.form.details }}
+                    </th>
+                    <th scope="col">
+                        <label for="id_version">Версия</label><br>
+                        {{ filter.form.version }}
+                    </th>
+                    <th scope="col">
+                        <label for="id_link">Ссылка</label><br>
+                        {{ filter.form.link }}
+                    </th>
+                    <th scope="col">
                         <div class="d-flex justify-content-between">
                             <div>
-                                {{ filter.form.port }}
+                                <label for="id_description">Описание</label><br>
+                                {{ filter.form.description }}
                             </div>
                             <div>
                                 <button type="submit" class="btn btn-primary">Поиск</button>
                             </div>
                         </div>
                     </th>
-                    {% endif %}
                 </tr>
                 </thead>
                 <tbody>
-                {% for i_obj in object_list %}
+                {% for asset in data_assets %}
                 <tr>
-                    <td><a href="{% url 'my_data_asset:data-asset-detail' i_obj.pk %}">{{ i_obj.uir }}</a></td>
-                    <td><a href="{{ i_obj.url }}" target="_blank">{{ i_obj.url }}</a></td>
-                    <td><a href="{% url 'my_data_asset:data-asset-detail' i_obj.pk %}">{{ i_obj.name }}</a></td>
-                    {% if user.is_superuser %}
-                    <td><a href="{% url 'my_data_asset:data-asset-detail' i_obj.pk %}">{{ i_obj.host }}</a></td>
-                    <td><a href="{% url 'my_data_asset:data-asset-detail' i_obj.pk %}">{{ i_obj.port }}</a></td>
-                    {% endif %}
+                    <td>
+                        {{ asset.type.name }}-{{ asset.domain.name }}-{{ asset.details.name }}-{{ asset.version.name }}
+                    </td>
+                    <td>
+                        <a href="{% url 'my_data_asset:data-asset-detail' asset.pk %}">
+                            {{ asset.type.name }}
+                        </a>
+                    </td>
+                    <td>
+                        <a href="{% url 'my_data_asset:data-asset-detail' asset.pk %}">
+                            {{ asset.domain.name }}
+                        </a>
+                    </td>
+                    <td>
+                        <a href="{% url 'my_data_asset:data-asset-detail' asset.pk %}">
+                            {{ asset.details.name }}
+                        </a>
+                    </td>
+                    <td>
+                        <a href="{% url 'my_data_asset:data-asset-detail' asset.pk %}">
+                            {{ asset.version.name }}
+                        </a>
+                    </td>
+                    <td>
+                        {% if asset.link %}
+                        <a href="{{ asset.link }}" target="_blank">Ссылка</a>
+                        {% else %}
+                        -
+                        {% endif %}
+                    </td>
+                    <td>{{ asset.description|default:"-" }}</td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="{% if user.is_superuser %}6{% else %}4{% endif %}"
-                        class="table-active text-center">
+                    <td colspan="6" class="table-active text-center">
                         Нет данных
                     </td>
                 </tr>

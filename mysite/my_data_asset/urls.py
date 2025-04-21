@@ -1,18 +1,20 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .view.v1 import DataAssetAPIViewSet
+from .view.v1 import DataAssetAPIViewSet, AssetStatAPIViewSet
 from .view.web import (
     AboutAppView,
-    DataAssetView, DataAssetDetailView,
+    AssetView, DataAssetDetailView,
     DataModelView, DataModelDetailView,
     DataTableView, DataTableDetailView,
     DataAssetGroupsView, DataAssetGroupsDetailView,
     AssetStatListView, AssetStatDetailView,
+    AssetDomain, AssetDomainView, DomainTablesView,
 )
 
 app_name = 'my_data_asset'
 router = DefaultRouter()
-router.register("data-assets", DataAssetAPIViewSet)
+router.register("assets", DataAssetAPIViewSet)
+router.register("assets", AssetStatAPIViewSet)
 
 urlpatterns = [
     # тестирование
@@ -21,8 +23,11 @@ urlpatterns = [
     path('v1/api/', include(router.urls)),
     # WEB
     path('', AboutAppView.as_view(), name='about-app'),
+    # Источники данных dddx
+    path('asset/asset-domain/', AssetDomainView.as_view(), name='asset-domain'),
+    path('asset/asset-domain/<str:domain_id>/', DomainTablesView.as_view(), name='domain-tables'),
     # Источники данных
-    path('assets/', DataAssetView.as_view(), name='data-asset'),
+    path('assets/', AssetView.as_view(), name='data-asset'),
     path('assets/<str:pk>/', DataAssetDetailView.as_view(), name='data-asset-detail'),
     # Статистика источников данных
     path('stat/', AssetStatListView.as_view(), name='asset-stat'),

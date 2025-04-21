@@ -2,8 +2,7 @@ import random
 import string
 
 from simple_history.models import HistoricalRecords
-
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.db import models
 from django.db.models import DateField
 from django.db.models.functions import Now
@@ -44,7 +43,7 @@ class BaseModel(models.Model):
         , help_text="Запись активна?"
     )
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
         , verbose_name='Автор'
         , help_text="Автор"
     )

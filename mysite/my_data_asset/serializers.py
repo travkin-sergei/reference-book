@@ -1,8 +1,8 @@
 from rest_framework import serializers
 from .models import (
-    DataAsset,
-    DataAssetType,
-    DataAssetStatus, AssetStat,
+    Asset,
+    AssetType,
+    AssetStat,
 )
 
 
@@ -10,30 +10,30 @@ class DataAssetTypeSerializer(serializers.ModelSerializer):
     """Сериализация для отображения в DataAssetSerializer."""
 
     class Meta:
-        model = DataAssetType
+        model = AssetType
         fields = 'name',
 
 
-class DataAssetStatusSerializer(serializers.ModelSerializer):
-    """Сериализация для отображения в DataAssetSerializer."""
+# class DataAssetStatusSerializer(serializers.ModelSerializer):
+#     """Сериализация для отображения в DataAssetSerializer."""
+#
+#     class Meta:
+#         model = AssetStatus
+#         fields = 'name',
 
-    class Meta:
-        model = DataAssetStatus
-        fields = 'name',
 
-
-class DataAssetSerializer(serializers.ModelSerializer):
+class AssetSerializer(serializers.ModelSerializer):
     """Сериализация списка источников данных."""
 
     type = serializers.CharField(source='type.name', read_only=True)
     status = serializers.CharField(source='status.name', read_only=True)
 
     class Meta:
-        model = DataAsset
+        model = Asset
         fields = [
-            'hash_address', 'last_update',
+            'hash_address',
             'uir', 'url',
-            'name', 'comment', 'version',
+            'name', 'comment',
             'host', 'port',
             'type', 'status',
         ]

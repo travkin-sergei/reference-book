@@ -2,8 +2,8 @@ from rest_framework import permissions
 from rest_framework.viewsets import ModelViewSet
 from drf_spectacular.utils import extend_schema
 
-from ..models import DataAsset, AssetStat
-from ..serializers import DataAssetSerializer, AssetStatSerializer
+from ..models import Asset, AssetStat
+from ..serializers import AssetSerializer, AssetStatSerializer
 
 
 @extend_schema(
@@ -21,16 +21,18 @@ class DataAssetAPIViewSet(ModelViewSet):
     1) Запросы 'POST','PUT','PATCH','DELETE' - требуем авторизацию!!!
     """
 
-    queryset = DataAsset.objects.all()
-    serializer_class = DataAssetSerializer
+    queryset = Asset.objects.all()
+    serializer_class = AssetSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_permissions(self):
-        # Если метод запроса - это создание, обновление или удаление, требуем авторизацию
-        if self.request.method in ['POST', 'PUT', 'PATCH', 'DELETE']:
-            self.permission_classes = [permissions.IsAuthenticated]
+
+        if self.request.method in ['GET', ]:
+            # Разрешаем доступ для неавторизованных пользователей
+            self.permission_classes = [permissions.AllowAny]
         else:
-            self.permission_classes = [permissions.AllowAny]  # Разрешаем доступ для неавторизованных пользователей
+            # Если метод запроса - это создание, обновление или удаление, требуем авторизацию
+            self.permission_classes = [permissions.IsAuthenticatedOrReadOnly]
         return super().get_permissions()
 
     @extend_schema(
@@ -97,10 +99,10 @@ class DataAssetAPIViewSet(ModelViewSet):
             """
     ),
 )
-class DataAssetAPIViewSet(ModelViewSet):
+class AssetStatAPIViewSet(ModelViewSet):
     queryset = AssetStat.objects.all()
     serializer_class = AssetStatSerializer
-
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     @extend_schema(
         summary="Список источников данных",
         description="Извлечение списка источников данных",
@@ -131,6 +133,7 @@ class DataAssetAPIViewSet(ModelViewSet):
     )
     def destroy(self, request, *args, **kwargs):
         return super().destroy(request, *args, **kwargs)
+
     @extend_schema(
         summary="Частичное обновление определенного источника данных",
         description="Частичное обновление определенного источника данных по его ID. Укажите только те поля, которые хотите обновить.",

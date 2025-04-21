@@ -9,14 +9,15 @@ from django.views.generic import (
 )
 
 from ..filters import (
-    DataAssetFilter,
-    DataModelFilter, DataAssetGroupFilter, AssetStatFilter,
+    AssetFilter,
+    DataModelFilter, AssetGroupFilter, AssetStatFilter, AssetDomainFilter,
 )
 from ..models import (
-    DataAsset,
+    Asset,
+    AssetDomain,
     DataModel,
     DataTable,
-    DataValue, DataAssetGroup, DataAssetGroupAsset, AssetStat,
+    DataValue, AssetGroup, DataAssetGroupAsset, AssetStat,
 )
 
 
@@ -33,31 +34,101 @@ class AboutAppView(TemplateView):
         return context
 
 
-class DataAssetView(ListView):
-    """Отображение списка источников данных с возможностью фильтрации данных на web странице."""
-
+class AssetView(ListView):
     template_name = 'my_data_asset/asset.html'
-    queryset = DataAsset.objects.filter(is_active=True)
+    queryset = Asset.objects.filter(is_active=True).select_related('type', 'domain', 'details', 'version')
     context_object_name = 'data_assets'
     paginate_by = 20
 
     def get_queryset(self):
-        """Фильтруем queryset на основе параметров запроса."""
         queryset = super().get_queryset()
-        self.filter = DataAssetFilter(self.request.GET, queryset=queryset)  # Инициализируем фильтр
-        return self.filter.qs  # Возвращаем отфильтрованный queryset
+
+        # Фильтрация по domain_id из URL
+        domain_id = self.kwargs.get('domain_id')
+        if domain_id:
+            queryset = queryset.filter(domain_id=domain_id)
+
+        # Применяем фильтр из GET-параметров
+        self.filter = AssetFilter(self.request.GET, queryset=queryset)
+        return self.filter.qs
 
     def get_context_data(self, **kwargs):
-        """Добавляем фильтр в контекст."""
         context = super().get_context_data(**kwargs)
         context['filter'] = self.filter
+
+        # Добавляем текущий домен, если фильтрация по домену
+        domain_id = self.kwargs.get('domain_id')
+        if domain_id:
+            context['current_domain'] = AssetDomain.objects.get(id=domain_id)
+
         return context
+
+    def get_context_data(self, **kwargs):
+        """Add filter and domain information to context."""
+        context = super().get_context_data(**kwargs)
+        context['filter'] = self.filter
+
+        # Add domain information if filtering by domain
+        domain_id = self.kwargs.get('domain_id')
+        if domain_id:
+            context['current_domain'] = AssetDomain.objects.get(id=domain_id)
+
+        # Add reference back to the main domain view
+        context['domain_view_class'] = AssetDomainView
+
+        return context
+
+
+class AssetDomainView(TemplateView):
+    """
+    Main domain view that contains reference to AssetView for detailing.
+    """
+    template_name = 'my_data_asset/asset-domain.html'
+    queryset = AssetDomain.objects.filter(is_active=True)
+    context_object_name = 'asset_domain'
+    asset_view_class = AssetView  # Reference to the detail view class
+
+    def get_context_data(self, **kwargs):
+        """Add filtered queryset to context along with asset view information."""
+        context = super().get_context_data(**kwargs)
+
+        # Initialize filter
+        self.filter = AssetDomainFilter(self.request.GET, queryset=self.queryset)
+
+        # Add to context
+        context[self.context_object_name] = self.filter.qs
+        context['filter'] = self.filter
+
+        # Add information about the asset view class
+        context['asset_view'] = {
+            'class': self.asset_view_class,
+            'name': self.asset_view_class.__name__,
+            'template': self.asset_view_class.template_name,
+            'context_name': self.asset_view_class.context_object_name
+        }
+
+        return context
+
+# views.py
+class DomainTablesView(ListView):
+    template_name = 'my_data_asset/domain_tables.html'
+    context_object_name = 'tables'
+
+    def get_queryset(self):
+        domain_id = self.kwargs['domain_id']
+        return DataTable.objects.filter(domain_id=domain_id, is_active=True)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['domain'] = AssetDomain.objects.get(id=self.kwargs['domain_id'])
+        return context
+
 
 
 class DataAssetDetailView(DetailView):
     """Представление для отображения деталей источника данных."""
 
-    queryset = DataAsset.objects.filter(is_active=True)
+    queryset = Asset.objects.filter(is_active=True)
     template_name = 'my_data_asset/asset-detail.html'
     context_object_name = 'data_asset_detail'
 
@@ -180,14 +251,14 @@ class DataTableDetailView(DetailView):
 class DataAssetGroupsView(ListView):
     """Отображение групп источников данных."""
 
-    queryset = DataAssetGroup.objects.filter(is_active=True)
+    queryset = AssetGroup.objects.filter(is_active=True)
     template_name = 'my_data_asset/asset-groups.html'
     context_object_name = 'data_asset_groups'
 
     def get_queryset(self):
         """Фильтруем queryset на основе параметров запроса."""
         queryset = super().get_queryset()
-        self.filter = DataAssetGroupFilter(self.request.GET, queryset=queryset)  # Инициализируем фильтр
+        self.filter = AssetGroupFilter(self.request.GET, queryset=queryset)  # Инициализируем фильтр
         return self.filter.qs  # Возвращаем отфильтрованный queryset
 
     def get_context_data(self, **kwargs):
@@ -200,7 +271,7 @@ class DataAssetGroupsView(ListView):
 class DataAssetGroupsDetailView(DetailView):
     """Отображение групп источников данных."""
 
-    queryset = DataAssetGroup.objects.filter(is_active=True)  # Убедитесь, что это правильная модель
+    queryset = AssetGroup.objects.filter(is_active=True)  # Убедитесь, что это правильная модель
     template_name = 'my_data_asset/asset-groups-detail.html'
     context_object_name = 'data_asset_group'
 

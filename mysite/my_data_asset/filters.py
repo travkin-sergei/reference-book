@@ -1,25 +1,39 @@
 import django_filters
-from django_filters import CharFilter
+from django_filters import CharFilter, ModelChoiceFilter
 from .models import (
-    DataAsset,
     DataModel,
-    DataAssetGroup, AssetStat,
+    Asset,
+    AssetStat,
+    AssetGroup,
+    AssetDomain,
 )
 
-
-class DataAssetFilter(django_filters.FilterSet):
-    """Фильтрация источников данных."""
-
-    uir = CharFilter(field_name='uir', lookup_expr='icontains', )
-    name = CharFilter(field_name='name', lookup_expr='icontains', )
-    url = CharFilter(field_name='url', lookup_expr='icontains', )
-    comment = CharFilter(field_name='comment', lookup_expr='icontains', )
-    host = CharFilter(field_name='host', lookup_expr='icontains', )
-    port = CharFilter(field_name='port', lookup_expr='icontains', )
+# filters.py
+class AssetDomainFilter(django_filters.FilterSet):
+    name = CharFilter(field_name='name', lookup_expr='icontains')
+    description = CharFilter(field_name='description', lookup_expr='icontains')
+    link = CharFilter(field_name='link', lookup_expr='icontains')
 
     class Meta:
-        model = DataAsset
-        fields = 'uir', 'name', 'url', 'host', 'port', 'comment',
+        model = AssetDomain
+        fields = ['name', 'description', 'link']
+
+
+class AssetFilter(django_filters.FilterSet):
+    """Фильтрация источников данных."""
+
+    type = CharFilter(field_name='type', lookup_expr='icontains', )
+    domain = ModelChoiceFilter(
+        queryset=AssetDomain.objects.all(),
+        field_name='domain'
+    )
+    details = CharFilter(field_name='details', lookup_expr='icontains', )
+    version = CharFilter(field_name='version', lookup_expr='icontains', )
+    link = CharFilter(field_name='link', lookup_expr='icontains', )
+
+    class Meta:
+        model = Asset
+        fields = 'type', 'domain', 'details', 'version', 'link',
 
 
 class DataModelFilter(django_filters.FilterSet):
@@ -33,14 +47,14 @@ class DataModelFilter(django_filters.FilterSet):
         fields = 'name', 'comment',
 
 
-class DataAssetGroupFilter(django_filters.FilterSet):
+class AssetGroupFilter(django_filters.FilterSet):
     """Фильтрация моделей данных."""
 
     name = CharFilter(field_name='name', lookup_expr='icontains', )
     description = CharFilter(field_name='description', lookup_expr='icontains', )
 
     class Meta:
-        model = DataAssetGroup
+        model = AssetGroup
         fields = 'name', 'description',
 
 

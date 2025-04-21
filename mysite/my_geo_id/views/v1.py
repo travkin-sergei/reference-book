@@ -106,7 +106,7 @@ class ObjectMapSubViewSet(ModelViewSet):
     @extend_schema(
         summary='Список ObjectMapSub',
         description='Получить список всех ObjectMapSub.',
-        tags=["geo_object_sub"],
+        tags=tags
     )
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
@@ -114,7 +114,7 @@ class ObjectMapSubViewSet(ModelViewSet):
     @extend_schema(
         summary='Создать ObjectMapSub',
         description='Создать новый объект ObjectMapSub.',
-        tags=["geo_object_sub"],
+        tags=tags
     )
     def create(self, request, *args, **kwargs):
         self.check_permissions(request)  # Проверка разрешений
@@ -123,7 +123,7 @@ class ObjectMapSubViewSet(ModelViewSet):
     @extend_schema(
         summary='Получить ObjectMapSub',
         description='Получить объект ObjectMapSub по ID.',
-        tags=["geo_object_sub"],
+        tags=tags
     )
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
@@ -131,7 +131,7 @@ class ObjectMapSubViewSet(ModelViewSet):
     @extend_schema(
         summary='Обновить ObjectMapSub',
         description='Обновить объект ObjectMapSub по ID.',
-        tags=["geo_object_sub"],
+        tags=tags
     )
     def update(self, request, *args, **kwargs):
         self.check_permissions(request)  # Проверка разрешений
@@ -140,7 +140,7 @@ class ObjectMapSubViewSet(ModelViewSet):
     @extend_schema(
         summary='Частичное обновление ObjectMapSub',
         description='Частично обновить объект ObjectMapSub по ID.',
-        tags=["geo_object_sub"],
+        tags=tags
     )
     def partial_update(self, request, *args, **kwargs):
         self.check_permissions(request)  # Проверка разрешений
@@ -149,7 +149,7 @@ class ObjectMapSubViewSet(ModelViewSet):
     @extend_schema(
         summary='Удалить ObjectMapSub',
         description='Удалить объект ObjectMapSub по ID.',
-        tags=["geo_object_sub"],
+        tags=tags
     )
     def destroy(self, request, *args, **kwargs):
         self.check_permissions(request)  # Проверка разрешений

@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models.functions import Now
 from django_ckeditor_5.fields import CKEditor5Field
+from django.core.validators import MinValueValidator
 
 db_schema = 'my_data_asset'
 
@@ -31,7 +32,7 @@ class SystemColumns(models.Model):
 
 
 class BaseModel(SystemColumns):
-    """Базовая модель приложения DataAsset."""
+    """Базовая модель приложения Asset."""
 
     hash_address = models.CharField(
         max_length=64, blank=True, null=True
@@ -54,139 +55,168 @@ class BaseModel(SystemColumns):
         abstract = True
 
 
-class DataAssetType(SystemColumns):
-    """
-    Справочник типов источников данных.
-    Ограничение уникальность:
-     - Тип источника данных.
-     """
+class AssetType(BaseModel):
+    """Типа"""
 
     name = models.CharField(
-        max_length=255
-        , db_comment='{"name":"Тип источника данных.",}'
-        , help_text="Тип источника данных.",
-    )
-
-    def __str__(self):
-        return self.name or 'NO DATA'
-
-    class Meta:
-        managed = True
-        db_table = f'{db_schema}\".\"asset_type'  # Указываем имя таблицы в базе данных
-        unique_together = [["name", ]]
-        verbose_name = '01.1 Тип источника данных'  # Указываем имя таблицы в админке
-        verbose_name_plural = '01.1 Типы источников данных'  # Указываем имя таблицы в админке
-
-
-class DataAssetStatus(SystemColumns):
-    """
-    Справочник статусов источников данных.
-    Ограничение уникальность:
-     - Статус ресурса;
-    """
-
-    name = models.CharField(
-        max_length=255
-        , verbose_name="Статус ресурса"
-        , db_comment='{"name":"Статус ресурса.",}'
-    )
-
-    def __str__(self):
-        return self.name or 'NO DATA'
-
-    class Meta:
-        managed = True
-        db_table = f'{db_schema}\".\"assets_status'  # Указываем имя таблицы в базе данных
-        unique_together = [["name", ]]
-        verbose_name = '01.2 Статус источника данных'  # Указываем имя таблицы в админке
-        verbose_name_plural = '01.2 Статус источников данных'  # Указываем имя таблицы в админке
-
-
-class DataAsset(BaseModel):
-    """
-    Список описанных источников данных.
-    Ограничение уникальность:
-     - Уникальный идентификатор ресурса;
-    """
-
-    uir = models.CharField(
         primary_key=True
         , max_length=255
-        , verbose_name="УИР."
-        , db_comment='{"name":"Уникальный идентификатор ресурса",}'
-        , help_text="Уникальный идентификатор ресурса.",
+        , verbose_name="Тип данных."
+        , db_comment='{"name":"Тип данных.",}'
+        , help_text="Тип данных.",
     )
-    type = models.ForeignKey(
-        'DataAssetType', on_delete=models.CASCADE, null=True, blank=True
-        , verbose_name="Тип источника данных"
-        , db_comment='{"name":"Тип источника данных.",}'
-        , help_text="Тип источника данных."
-    )
-    url = models.URLField(
+    description = models.CharField(
         blank=True, null=True
-        , verbose_name="URL."
-        , db_comment='{"name":"URL ссылка.",}'
-        , help_text="URL ссылка.",
-    )
-    name = models.CharField(
-        max_length=255, blank=True, null=True
-        , verbose_name="Название"
-        , db_comment='{"name":"Название ресурса",}'
-        , help_text="Название ресурса",
-    )
-    comment = CKEditor5Field(
-        blank=True, null=True
-        , verbose_name="Комментарий"
-        , db_comment='{"name":"Описание ресурса",}'
-        , help_text="Описание ресурса.",
-    )
-    host = models.CharField(
-        max_length=255, blank=True, null=True
-        , verbose_name="Хост"
-        , db_comment='{"name":"Хост.",}'
-    )
-    port = models.CharField(
-        max_length=255, blank=True, null=True
-        , verbose_name="Порт."
-        , db_comment='{"name":"Порт",}'
+        , verbose_name="Описание."
+        , db_comment='{"name":"Описание.",}'
+        , help_text="Тип данных.",
     )
 
     def __str__(self):
-        return f'{self.uir}' or 'NO DATA'
+        return f'{self.name}' or 'NO DATA'
 
     class Meta:
         managed = True
-        db_table = f'{db_schema}\".\"assets'  # Указываем имя таблицы в базе данных
+        db_table = f'{db_schema}\".\"asset_type_2'  # Указываем имя таблицы в базе данных
         ordering = ['name']  # Сортировка по дате создания (по убыванию)
-        unique_together = (('uir',),)
-        verbose_name = '01 Источник данных'  # Указываем имя таблицы в админке
-        verbose_name_plural = '01 Источники данных'  # Указываем имя таблицы в админке
+        unique_together = (('name',),)
+        verbose_name = '010 AssetType'  # Указываем имя таблицы в админке
+        verbose_name_plural = '010 AssetType'  # Указываем имя таблицы в админке
+
+
+class AssetDomain(BaseModel):
+    """Типа"""
+
+    name = models.CharField(
+        primary_key=True
+        , max_length=255
+        , verbose_name="Домен данных."
+        , db_comment='{"name":"Домен данных.",}'
+        , help_text="Домен данных.",
+    )
+    description = models.CharField(
+        blank=True, null=True
+        , verbose_name="Описание."
+        , db_comment='{"name":"Описание.",}'
+        , help_text="Тип данных.",
+    )
+    link = models.URLField(
+        blank=True, null=True
+        , verbose_name="Ссылка на ресурс."
+        , db_comment='{"name":"Ссылка на ресурс.",}'
+        , help_text="Ссылка на ресурс",
+    )
+
+    def __str__(self):
+        return f'{self.name}' or 'NO DATA'
+
+    class Meta:
+        managed = True
+        db_table = f'{db_schema}\".\"asset_domain'  # Указываем имя таблицы в базе данных
+        ordering = ['name']  # Сортировка по дате создания (по убыванию)
+        unique_together = (('name',),)
+        verbose_name = '020 AssetDomain'  # Указываем имя таблицы в админке
+        verbose_name_plural = '020 AssetDomain'  # Указываем имя таблицы в админке
+
+
+class AssetDetails(BaseModel):
+    """Типа"""
+
+    name = models.CharField(
+        primary_key=True
+        , max_length=255
+        , verbose_name="Детализация данных."
+        , db_comment='{"name":"Детализация данных.",}'
+        , help_text="Детализация данных.",
+    )
+    description = models.CharField(
+        blank=True, null=True
+        , verbose_name="Описание."
+        , db_comment='{"name":"Описание.",}'
+        , help_text="Тип данных.",
+    )
+
+    def __str__(self):
+        return f'{self.name}' or 'NO DATA'
+
+    class Meta:
+        managed = True
+        db_table = f'{db_schema}\".\"asset_details'  # Указываем имя таблицы в базе данных
+        ordering = ['name']  # Сортировка по дате создания (по убыванию)
+        unique_together = (('name',),)
+        verbose_name = '030 AssetDetails'  # Указываем имя таблицы в админке
+        verbose_name_plural = '030 AssetDetails'  # Указываем имя таблицы в админке
+
+
+class AssetVersion(BaseModel):
+    """Типа"""
+    name = models.PositiveIntegerField(
+        primary_key=True
+        , verbose_name="Версия данных."
+        , db_comment='{"name":"Версия данных.",}'
+        , help_text="Версия данных.",
+    )
+
+    def __str__(self):
+        return f'{self.name}' or 'NO DATA'
+
+    class Meta:
+        managed = True
+        db_table = f'{db_schema}\".\"asset_version'  # Указываем имя таблицы в базе данных
+        ordering = ['name']  # Сортировка по дате создания (по убыванию)
+        unique_together = (('name',),)
+        verbose_name = '040 AssetVersion'  # Указываем имя таблицы в админке
+        verbose_name_plural = '040 AssetVersion'  # Указываем имя таблицы в админке
+
+
+class Asset(BaseModel):
+    """Статистка источника данных."""
+
+    type = models.ForeignKey(AssetType, on_delete=models.CASCADE)
+    domain = models.ForeignKey(AssetDomain, on_delete=models.CASCADE)
+    details = models.ForeignKey(AssetDetails, on_delete=models.CASCADE)
+    version = models.ForeignKey(AssetVersion, on_delete=models.CASCADE)
+    link = models.URLField(
+        blank=True, null=True
+        , verbose_name="Ссылка на ресурс."
+        , db_comment='{"name":"Ссылка на ресурс.",}'
+        , help_text="Ссылка на ресурс",
+    )
+    description = models.CharField(
+        blank=True, null=True
+        , max_length=255
+        , verbose_name="Описание."
+        , db_comment='{"name":"Описание.",}'
+        , help_text="Описание",
+    )
+
+    class Meta:
+        managed = True
+        db_table = f'{db_schema}\".\"assets_1'  # Указываем имя таблицы в базе данных
+        ordering = ['type', 'domain', 'details', 'version', ]  # Сортировка по дате создания (по убыванию)
+        unique_together = (('type', 'domain', 'details', 'version'),)
+        verbose_name = '050 Asset'  # Указываем имя таблицы в админке
+        verbose_name_plural = '050 Asset'  # Указываем имя таблицы в админке
 
 
 class AssetStat(BaseModel):
     """Статистка источника данных."""
 
-    uir = models.ForeignKey('DataAsset', on_delete=models.CASCADE)  # Внешний ключ
-
-    status = models.ForeignKey(
-        'DataAssetStatus', on_delete=models.CASCADE, null=True, blank=True
-        , verbose_name="Статус"
-        , db_comment='{"name":"Статус",}'
+    uir = models.ForeignKey('Asset', on_delete=models.CASCADE)  # Внешний ключ
+    period = models.CharField(
+        null=True, blank=True
+        , verbose_name="Период"
+        , db_comment='{"name":"Период",}'
     )
     date_last = models.DateField(
         blank=True, null=True
         , verbose_name="По состоянию на"
         , db_comment='{"name":"По состоянию на",}'
     )
-    row_last = models.PositiveIntegerField(
+    row_period = models.PositiveIntegerField(
         blank=True, null=True
-        , verbose_name="Количество строк последнего обновления."
-        , db_comment='{"name":"Количество строк последнего обновления.",}'
-    )
-    row_actual = models.PositiveIntegerField(
-        blank=True, null=True
-        , verbose_name="Количество актуальных строк."
-        , db_comment='{"name":"Количество актуальных строк.",}'
+        , verbose_name="Количество актуализированных строк за период."
+        , db_comment='{"name":"Количество актуализированных строк за период.",}'
     )
     version = models.CharField(
         max_length=255, blank=True, null=True
@@ -194,13 +224,16 @@ class AssetStat(BaseModel):
         , db_comment='{"name":"Версия ресурса.",}'
         , help_text="Версия ресурса.",
     )
-    control_1 = models.PositiveIntegerField(
-        blank=True, null=True
+    control_1 = models.DecimalField(
+        max_digits=10, decimal_places=2
+        , blank=True, null=True
         , verbose_name="Контрольная цифра №1."
         , db_comment='{"name":"Контрольная цифра №1.",}'
     )
-    control_2 = models.PositiveIntegerField(
-        blank=True, null=True
+    control_2 = models.DecimalField(
+        max_digits=10, decimal_places=2
+        , validators=[MinValueValidator(0)]
+        , blank=True, null=True
         , verbose_name="Контрольная цифра №2."
         , db_comment='{"name":"Контрольная цифра №2.",}'
     )
@@ -209,32 +242,9 @@ class AssetStat(BaseModel):
         managed = True
         db_table = f'{db_schema}\".\"assets_stat'  # Указываем имя таблицы в базе данных
         ordering = ['uir', 'date_last']  # Сортировка по дате создания (по убыванию)
-        unique_together = (('uir', 'date_last'),)
+        unique_together = (('uir', 'period', 'date_last'),)
         verbose_name = '01.01 Статистика источника данных'  # Указываем имя таблицы в админке
         verbose_name_plural = '01.01 Статистика источника данных'  # Указываем имя таблицы в админке
-
-
-class AssetLink(BaseModel):
-    asset_stat = models.ForeignKey(
-        'AssetStat', on_delete=models.CASCADE, null=True, blank=True
-        , verbose_name="Ссылка на файлы обновлений."
-        , db_comment='{"name":"Ссылка на файлы обновлений.",}'
-    )
-    link_file = models.URLField(
-        blank=True, null=True
-        , unique=True
-        , verbose_name="URL."
-        , db_comment='{"name":"URL ссылка.",}'
-        , help_text="URL ссылка.",
-    )
-
-    class Meta:
-        managed = True
-        db_table = f'{db_schema}\".\"assets_link'
-        # ordering = ['link_file', ]
-        # unique_together = (('uir', 'date_last'),)
-        verbose_name = '01.02 Ссылка на файлы источника данных'
-        verbose_name_plural = '01.02 Ссылка на файлы источника данных'
 
 
 class DataModel(BaseModel):
@@ -245,7 +255,7 @@ class DataModel(BaseModel):
      - Название модели.
     """
 
-    data_asset = models.ForeignKey('DataAsset', on_delete=models.CASCADE, null=True, blank=True)  # Внешний ключ
+    data_asset = models.ForeignKey(Asset, on_delete=models.CASCADE, null=True, blank=True)  # Внешний ключ
     name = models.CharField(max_length=255, blank=True, null=True)  # Схема
     comment = CKEditor5Field(
         help_text="Комментарий.",
@@ -259,8 +269,8 @@ class DataModel(BaseModel):
         managed = True
         db_table = f'{db_schema}\".\"models'  # Указываем имя таблицы в базе данных
         unique_together = [["data_asset", "name", ]]
-        verbose_name = '02 Модель данных'  # Указываем имя таблицы в админке
-        verbose_name_plural = '02 Модели данных'  # Указываем имя таблицы в админке
+        verbose_name = '2 Модель данных'  # Указываем имя таблицы в админке
+        verbose_name_plural = '2 Модели данных'  # Указываем имя таблицы в админке
 
 
 class DataTable(BaseModel):
@@ -273,7 +283,7 @@ class DataTable(BaseModel):
     """
 
     data_model = models.ForeignKey(
-        'DataModel', on_delete=models.CASCADE, null=True, blank=True
+        DataModel, on_delete=models.CASCADE, null=True, blank=True
     )  # Внешний ключ
     type = models.CharField(
         max_length=255, blank=True, null=True
@@ -293,8 +303,8 @@ class DataTable(BaseModel):
         managed = True
         db_table = f'{db_schema}\".\"data_table'  # Указываем имя таблицы в базе данных
         unique_together = [["data_model", "type", "name", ]]
-        verbose_name = '03 Таблица данных'  # Указываем имя таблицы в админке
-        verbose_name_plural = '03 Таблицы данных'  # Указываем имя таблицы в админке
+        verbose_name = '3 Таблица данных'  # Указываем имя таблицы в админке
+        verbose_name_plural = '3 Таблицы данных'  # Указываем имя таблицы в админке
 
 
 class DataValue(BaseModel):
@@ -306,7 +316,7 @@ class DataValue(BaseModel):
     """
 
     data_table = models.ForeignKey(
-        'DataTable', on_delete=models.CASCADE, null=True, blank=True
+        DataTable, on_delete=models.CASCADE, null=True, blank=True
         , verbose_name="Список таблиц данных моделей."
         , db_comment='{"name":"Список таблиц данных моделей.",}'
         , help_text="Список таблиц данных моделей.",
@@ -343,12 +353,12 @@ class DataValue(BaseModel):
         db_table = f'{db_schema}\".\"value_table'
         unique_together = [['data_table', 'name', ]]
         ordering = ['created_at']  # Сортировка по дате создания (по убыванию)
-        verbose_name = '04 Значения таблицы'  # Указываем имя таблицы в админке
-        verbose_name_plural = '04 Значения таблицы'  # Указываем имя таблицы в админке
+        verbose_name = '4 Значения таблицы'  # Указываем имя таблицы в админке
+        verbose_name_plural = '4 Значения таблицы'  # Указываем имя таблицы в админке
 
 
 # =============================================== Группировки источников ===============================================
-class DataAssetGroup(SystemColumns):
+class AssetGroup(SystemColumns):
     """
     Названия групп источников данных.
     Ограничение уникальность:
@@ -373,8 +383,8 @@ class DataAssetGroup(SystemColumns):
         managed = True
         db_table = f'{db_schema}\".\"asset_group'  # Указываем имя таблицы в базе данных
         unique_together = [["name", ]]
-        verbose_name = '__ Группа источников'  # Указываем имя таблицы в админке
-        verbose_name_plural = '__ Группы источников'  # Указываем имя таблицы в админке
+        verbose_name = '060 Группа источников'  # Указываем имя таблицы в админке
+        verbose_name_plural = '060 Группы источников'  # Указываем имя таблицы в админке
 
 
 class DataAssetGroupAsset(SystemColumns):
@@ -386,13 +396,13 @@ class DataAssetGroupAsset(SystemColumns):
     """
 
     name = models.ForeignKey(
-        'DataAssetGroup', on_delete=models.CASCADE
+        AssetGroup, on_delete=models.CASCADE
         , related_name='related_group'
         , verbose_name="Названия групп источников данных."
         , help_text="Названия групп источников данных."
     )
     data_assets = models.ForeignKey(
-        'DataAsset', on_delete=models.CASCADE
+        Asset, on_delete=models.CASCADE
         , related_name='related_assets'
         , verbose_name="Список описанных источников данных."
         , help_text="Список описанных источников данных."
@@ -423,7 +433,7 @@ class DataModelGroup(SystemColumns):
         , help_text="Названия групп источников данных.",
     )
     data_models = models.ManyToManyField(
-        'DataModel'
+        DataModel
         , related_name='f_model'
         , verbose_name="Группировка источников данных."
         , help_text="Группировка источников данны."
@@ -454,7 +464,7 @@ class DataTableGroup(SystemColumns):
         , help_text="Названия групп источников данных.",
     )
     data_tables = models.ManyToManyField(
-        'DataTable'
+        DataTable
         , related_name='f_table'
         , verbose_name="Группировка источников данных."
         , help_text="Группировка источников данны."
@@ -485,7 +495,7 @@ class DataValueGroup(SystemColumns):
         , help_text="Названия групп столбцов данных.",
     )
     data_values = models.ManyToManyField(
-        'DataValue'
+        DataValue
         , related_name='f_value'
         , verbose_name="Группировка источников данных."
         , help_text="Группировка источников данны."
