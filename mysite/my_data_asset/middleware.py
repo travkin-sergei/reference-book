@@ -1,5 +1,4 @@
 from django.http import Http404
-from django.conf import settings
 
 
 class RestrictSuperuserAccessMiddleware:

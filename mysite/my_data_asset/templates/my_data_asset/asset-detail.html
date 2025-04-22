@@ -1,57 +1,51 @@
 {% extends 'base.html' %}
-{% block title %}{{ title }}{% endblock title %}
+
+{% block title %}Детали: {{ asset }}{% endblock %}
+
 {% block body %}
+<div class="container mt-4">
+    <h2>Источник данных</h2>
+    <ul class="list-group mb-4">
+        <li class="list-group-item"><strong>Тип:</strong> {{ asset.type.name }}</li>
+        <li class="list-group-item"><strong>Домен:</strong> {{ asset.domain.name }}</li>
+        <li class="list-group-item"><strong>Детали:</strong> {{ asset.details.name }}</li>
+        <li class="list-group-item"><strong>Версия:</strong> {{ asset.version }}</li>
+        <li class="list-group-item"><strong>Описание:</strong> {{ asset.description|default:"—" }}</li>
+        {% if asset.link %}
+        <li class="list-group-item"><strong>Ссылка:</strong>
+            <a href="{{ asset.link }}" target="_blank">{{ asset.link }}</a>
+        </li>
+        {% endif %}
+    </ul>
 
-<div class="container">
-    <div class="row">
-        <div class="col-md-4">
-            <h2>ID: {{ data_asset_detail.uir|default:"" }}</h2>
-            <h2>{{ data_asset_detail.name|default:"" }}</h2>
-            <p><strong>Последнее обновление карточки:</strong>
-                {{ data_asset_detail.last_update|default:"" }}
-            </p>
-            <p><strong>Тип:</strong> {{ data_asset_detail.type|default:"" }}</p>
-            <p><strong>Статус:</strong> {{ data_asset_detail.status|default:"" }}</p>
-            <p><strong>Описание:</strong> {{ data_asset_detail.comment|safe|default:"" }}</p>
-            <p><strong>Версия:</strong> {{ data_asset_detail.version|default:"" }}</p>
-            {% if user.is_superuser %}
-            <p><strong>Хост:</strong> {{ data_asset_detail.host|default:"" }}</p>
-            <p><strong>Порт:</strong> {{ data_asset_detail.port|default:"" }}</p>
-            {% endif %}
-        </div>
-        <div class="col-md-8">
-            <h3>
-                <a href="{% url 'my_data_asset:data-model' %}" class="btn btn-secondary">Полный список.</a>
-                Связанные модели данных
-            </h3>
-            <table class="table table-striped">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Название модели</th>
-                    <th>Комментарий</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for data_model in page_obj %}
-                <tr>
-                    <td>{{ forloop.counter }}</td>
-                    <td>
-                        <a href="{% url 'my_data_asset:data-model-detail' data_model.id %}">
-                            {{ data_model.name }}
-                        </a>
-                    </td>
-                    <td>{{ data_model.comment|truncatechars:50|safe }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="3">Нет связанных моделей данных.</td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
+    <h4>Структура таблицы</h4>
+    {% if asset.columns.all %}
+    <table class="table table-bordered table-hover">
+        <thead class="thead-light">
+            <tr>
+                <th>Имя столбца</th>
+                <th>Тип данных</th>
+                <th>Описание</th>
+                <th>Nullable</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for column in asset.columns.all %}
+            <tr>
+                <td>{{ column.name }}</td>
+                <td>{{ column.data_type }}</td>
+                <td>{{ column.description|default:"—" }}</td>
+                <td>{{ column.is_nullable|yesno:"Да,Нет" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="alert alert-warning">
+        Нет описания столбцов для этого источника.
     </div>
-</div>
+    {% endif %}
 
+    <a href="{% url 'my_data_asset:data-asset' %}" class="btn btn-secondary mt-4">← Назад</a>
+</div>
 {% endblock %}

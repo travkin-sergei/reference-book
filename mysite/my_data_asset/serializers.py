@@ -2,66 +2,72 @@ from rest_framework import serializers
 from .models import (
     Asset,
     AssetType,
-    AssetStat,
+    AssetDomain,
+    AssetDetails,
+    AssetColumn,
+    AssetCategory,
+    AssetCategoryRelation,
 )
 
 
-class DataAssetTypeSerializer(serializers.ModelSerializer):
-    """Сериализация для отображения в DataAssetSerializer."""
-
+class AssetTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = AssetType
-        fields = 'name',
+        fields = '__all__'
 
 
-# class DataAssetStatusSerializer(serializers.ModelSerializer):
-#     """Сериализация для отображения в DataAssetSerializer."""
-#
-#     class Meta:
-#         model = AssetStatus
-#         fields = 'name',
+class AssetDomainSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AssetDomain
+        fields = '__all__'
+
+
+class AssetDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AssetDetails
+        fields = '__all__'
+
+
+class AssetColumnSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AssetColumn
+        fields = '__all__'
+
+
+class AssetCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AssetCategory
+        fields = '__all__'
+
+
+class AssetCategoryRelationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AssetCategoryRelation
+        fields = '__all__'
 
 
 class AssetSerializer(serializers.ModelSerializer):
-    """Сериализация списка источников данных."""
+    type = AssetTypeSerializer(read_only=True)
+    domain = AssetDomainSerializer(read_only=True)
+    details = AssetDetailsSerializer(read_only=True)
+    columns = AssetColumnSerializer(many=True, read_only=True)
 
-    type = serializers.CharField(source='type.name', read_only=True)
-    status = serializers.CharField(source='status.name', read_only=True)
+    # Для создания/обновления по ID
+    type_id = serializers.PrimaryKeyRelatedField(
+        queryset=AssetType.objects.all(), source='type', write_only=True
+    )
+    domain_id = serializers.PrimaryKeyRelatedField(
+        queryset=AssetDomain.objects.all(), source='domain', write_only=True
+    )
+    details_id = serializers.PrimaryKeyRelatedField(
+        queryset=AssetDetails.objects.all(), source='details', write_only=True
+    )
 
     class Meta:
         model = Asset
         fields = [
-            'hash_address',
-            'uir', 'url',
-            'name', 'comment',
-            'host', 'port',
-            'type', 'status',
+            'id', 'type', 'domain', 'details', 'version', 'link', 'description',
+            'created_at', 'updated_at', 'is_active',
+            'type_id', 'domain_id', 'details_id',
+            'columns'
         ]
-
-    def to_representation(self, instance):
-        """
-        Переопределяем метод to_representation для ограничения полей.
-        1. Получаем текущего пользователя из контекста
-        2. Проверяем, принадлежит ли пользователь к группе 'devops' или является супер администратором
-        3. Убираем поля 'host' и 'port', если пользователь не в группе 'devops' и не супер администратор
-        """
-
-        representation = super().to_representation(instance)
-        # 1.
-        request = self.context.get('request')
-        user = request.user if request else None
-        # 2.
-        if user and not (user.groups.filter(name='devops').exists() or user.is_superuser):
-            # 3.
-            representation.pop('host', None)
-            representation.pop('port', None)
-
-        return representation
-
-
-class AssetStatSerializer(serializers.ModelSerializer):
-    """Статистика источника данных."""
-
-    class Meta:
-        model = AssetStat
-        fields = '__all__'
