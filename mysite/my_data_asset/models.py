@@ -98,7 +98,7 @@ class AssetDomain(BaseModel):
         , db_comment='{"name":"Описание.",}'
         , help_text="Тип данных.",
     )
-    link = models.URLField(
+    res_url = models.URLField(
         blank=True, null=True
         , verbose_name="Ссылка на ресурс."
         , db_comment='{"name":"Ссылка на ресурс.",}'
@@ -158,12 +158,6 @@ class Asset(BaseModel):
         , db_comment='{"name":"Версия данных.",}'
         , help_text="Версия данных.",
     )
-    link = models.URLField(
-        blank=True, null=True
-        , verbose_name="Ссылка на ресурс."
-        , db_comment='{"name":"Ссылка на ресурс.",}'
-        , help_text="Ссылка на ресурс",
-    )
     description = models.CharField(
         blank=True, null=True
         , max_length=255
@@ -171,6 +165,20 @@ class Asset(BaseModel):
         , db_comment='{"name":"Описание.",}'
         , help_text="Описание",
     )
+    res_url = models.URLField(
+        blank=True, null=True
+        , verbose_name="Ссылка на ресурс."
+        , db_comment='{"name":"Ссылка на ресурс.",}'
+        , help_text="Ссылка на ресурс",
+    )
+    docs_url = models.URLField(
+        blank=True, null=True
+        , verbose_name="Нормативная документация."
+        , db_comment='{"name":"Нормативная документация.",}'
+        , help_text="Нормативная документация.",
+    )
+    last_update = models.DateTimeField(blank=True, null=True)
+    total_row = models.PositiveIntegerField(blank=True, null=True)
 
     def __str__(self):
         return f'{self.type}-{self.domain}-{self.details}-{self.version}'

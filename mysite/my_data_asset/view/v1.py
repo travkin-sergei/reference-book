@@ -17,6 +17,6 @@ class DataAssetAPIViewSet(viewsets.ModelViewSet):
     serializer_class = AssetSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class = AssetFilter
-    search_fields = ['version', 'description', 'link', 'type__name', 'domain__name', 'details__name']
+    search_fields = ['version', 'description', 'res_url', 'type__name', 'domain__name', 'details__name']
     ordering_fields = ['version', 'created_at', 'updated_at']
     ordering = ['-created_at']

@@ -66,7 +66,7 @@ class AssetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Asset
         fields = [
-            'id', 'type', 'domain', 'details', 'version', 'link', 'description',
+            'id', 'type', 'domain', 'details', 'version', 'res_url', 'description',
             'created_at', 'updated_at', 'is_active',
             'type_id', 'domain_id', 'details_id',
             'columns'

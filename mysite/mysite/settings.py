@@ -47,6 +47,7 @@ ALLOWED_HOSTS = ['*']
 
 # Application definition
 
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -62,9 +63,8 @@ INSTALLED_APPS = [
     'drf_spectacular',  # создание API
     'django_filters',  # фильтрация
     'django_ckeditor_5',  # Редактор текста
-
     # -------------------------------
-    'my_auth',  # приложение Аутентификация пользователя
+    'my_auth',  # авторизация
     'my_geo_id',  # приложение GEO-ID
     'my_data_asset',  # приложение Источники данных
     'my_task',  # приложение Задачи
@@ -105,23 +105,20 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
+
+schemas = info.get('DB_SCHEMA')
+
 DATABASES = {
-    'default':
-        {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': info.get('DB_DEFAULT_NAME'),
-            'USER': info.get('DB_DEFAULT_USER'),
-            'PASSWORD': info.get('DB_DEFAULT_PASS'),
-            'HOST': info.get('DB_DEFAULT_HOST'),
-            'PORT': info.get('DB_DEFAULT_PORT'),
-            'OPTIONS':
-                {
-                    'options': f'-c search_path={info.get("DB_SCHEMA")}'
-
-                },
-        },
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'OPTIONS': {'options': f'-c search_path={schemas}'},
+        'NAME': info.get('DB_DEFAULT_NAME'),
+        'USER': info.get('DB_DEFAULT_USER'),
+        'PASSWORD': info.get('DB_DEFAULT_PASS'),
+        'HOST': info.get('DB_DEFAULT_HOST'),
+        'PORT': info.get('DB_DEFAULT_PORT'),
+    },
 }
-
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
@@ -161,7 +158,7 @@ STATICFILES_DIRS = [STATIC_DIR]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-AUTH_USER_MODEL = 'my_auth.CustomUser'
+
 customColorPalette = [
     {'color': 'hsl(4, 90%, 58%)', 'label': 'Red'},
     {'color': 'hsl(340, 82%, 52%)', 'label': 'Pink'},
@@ -291,8 +288,9 @@ SPECTACULAR_SETTINGS = {
     },
 }
 
-DATA_UPLOAD_MAX_NUMBER_FIELDS = int(info.get('DJANGO_MAX_NUM'))  # Лимит по объему загрузки
+LOGIN_REDIRECT_URL = '/'
 
+DATA_UPLOAD_MAX_NUMBER_FIELDS = int(info.get('DJANGO_MAX_NUM'))  # Лимит по объему загрузки
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),

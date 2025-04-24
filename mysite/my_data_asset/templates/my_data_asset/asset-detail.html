@@ -11,9 +11,14 @@
         <li class="list-group-item"><strong>Детали:</strong> {{ asset.details.name }}</li>
         <li class="list-group-item"><strong>Версия:</strong> {{ asset.version }}</li>
         <li class="list-group-item"><strong>Описание:</strong> {{ asset.description|default:"—" }}</li>
-        {% if asset.link %}
-        <li class="list-group-item"><strong>Ссылка:</strong>
-            <a href="{{ asset.link }}" target="_blank">{{ asset.link }}</a>
+        {% if asset.res_url %}
+        <li class="list-group-item"><strong>Ссылка ресурс:</strong>
+            <a href="{{ asset.res_url }}" target="_blank">{{ asset.res_url }}</a>
+        </li>
+        {% endif %}
+        {% if asset.docs_url %}
+        <li class="list-group-item"><strong>Нормативная документация:</strong>
+            <a href="{{ asset.res_url }}" target="_blank">{{ asset.docs_url }}</a>
         </li>
         {% endif %}
     </ul>
@@ -22,22 +27,22 @@
     {% if asset.columns.all %}
     <table class="table table-bordered table-hover">
         <thead class="thead-light">
-            <tr>
-                <th>Имя столбца</th>
-                <th>Тип данных</th>
-                <th>Описание</th>
-                <th>Nullable</th>
-            </tr>
+        <tr>
+            <th>Имя столбца</th>
+            <th>Тип данных</th>
+            <th>Описание</th>
+            <th>Nullable</th>
+        </tr>
         </thead>
         <tbody>
-            {% for column in asset.columns.all %}
-            <tr>
-                <td>{{ column.name }}</td>
-                <td>{{ column.data_type }}</td>
-                <td>{{ column.description|default:"—" }}</td>
-                <td>{{ column.is_nullable|yesno:"Да,Нет" }}</td>
-            </tr>
-            {% endfor %}
+        {% for column in asset.columns.all %}
+        <tr>
+            <td>{{ column.name }}</td>
+            <td>{{ column.data_type }}</td>
+            <td>{{ column.description|default:"—" }}</td>
+            <td>{{ column.is_nullable|yesno:"Да,Нет" }}</td>
+        </tr>
+        {% endfor %}
         </tbody>
     </table>
     {% else %}

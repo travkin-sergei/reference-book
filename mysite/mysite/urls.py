@@ -20,6 +20,7 @@ urlpatterns = [
     path('api/v1/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/v1/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     # Приложения
+    path('auth/', include('my_auth.urls', namespace='my_auth')),
     path('asset/', include('my_data_asset.urls')),  # Приложение Источники данных
     path('', include('my_geo_id.urls')),  # Приложение GEO-ID
 

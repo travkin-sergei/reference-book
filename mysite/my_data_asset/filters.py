@@ -10,7 +10,7 @@ class AssetDomainFilter(django_filters.FilterSet):
 
     class Meta:
         model = AssetDomain
-        fields = ['name', 'description', 'link']
+        fields = ['name', 'description', 'res_url']
 
 
 class AssetFilter(django_filters.FilterSet):
@@ -19,8 +19,8 @@ class AssetFilter(django_filters.FilterSet):
     domain = django_filters.CharFilter(field_name='domain__name', lookup_expr='icontains')
     details = django_filters.CharFilter(field_name='details__name', lookup_expr='icontains')
     version = django_filters.CharFilter(lookup_expr='icontains')
-    link = django_filters.CharFilter(lookup_expr='icontains')
+    res_url = django_filters.CharFilter(lookup_expr='icontains')
 
     class Meta:
         model = Asset
-        fields = ['type', 'domain', 'details', 'version', 'link']
+        fields = ['type', 'domain', 'details', 'version', 'res_url']
