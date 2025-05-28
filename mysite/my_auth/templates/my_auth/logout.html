@@ -1,15 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>logout</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}
+    logout
+{% endblock %}
+{% block body %}
 <h2>Logged out</h2>
 <form method="post" action="{% url 'logout' %}">
   {% csrf_token %}
   <button type="submit">Выйти</button>
 </form>
-
-</body>
-</html>
+{% endblock body %}

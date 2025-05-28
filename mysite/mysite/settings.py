@@ -5,6 +5,7 @@ import environ
 
 from pathlib import Path
 from django.core.exceptions import ImproperlyConfigured
+from django.urls import reverse_lazy
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -247,6 +248,10 @@ CKEDITOR_5_FILE_UPLOAD_PERMISSION = "staff"  # Possible values: "staff", "authen
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+LOGIN_REDIRECT_URL = reverse_lazy("dba:table")
+LOGIN_URL = reverse_lazy("myauth:login")
+LOGOUT_REDIRECT_URL = reverse_lazy("myauth:login")
+
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': int(info.get('DJANGO_PAGE_SIZE')),
@@ -287,8 +292,6 @@ SPECTACULAR_SETTINGS = {
         'docExpansion': 'none',  # Свернуть все
     },
 }
-
-LOGIN_REDIRECT_URL = '/'
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = int(info.get('DJANGO_MAX_NUM'))  # Лимит по объему загрузки
 

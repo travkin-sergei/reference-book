@@ -1,14 +1,19 @@
 from django.urls import path
-from django.contrib.auth import views as auth_views
-from .views import profile_view, logout_view
+from .views import (
+    AboutAppView,
+    MyLoginView,
+    MyRegisterView,
+    MyLogoutView, MyProfileView, MyPasswordChangeView, MyPasswordChangeDoneView,
+)
 
 app_name = 'my_auth'
 
 urlpatterns = [
-    path('login/', auth_views.LoginView.as_view(template_name='my_auth/login.html'), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(template_name='my_auth/logout.html'), name='logout'),
-    path('profile/', profile_view, name='profile'),
-    path('password_change/', auth_views.PasswordChangeView.as_view(), name='password_change'),
-    path('password_change/done/', auth_views.PasswordChangeDoneView.as_view(), name='password_change_done'),
-
+    path('', AboutAppView.as_view(), name='about-app'),
+    path('login/', MyLoginView.as_view(), name='login'),
+    path('logout/', MyLogoutView.as_view(), name='logout'),
+    path('register/', MyRegisterView.as_view(), name='register'),
+    path('profile/', MyProfileView.as_view(), name='profile'),
+    path('password-change/', MyPasswordChangeView.as_view(), name='password_change'),
+    path('password-change/done/', MyPasswordChangeDoneView.as_view(), name='password_change_done'),
 ]

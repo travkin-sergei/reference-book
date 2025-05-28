@@ -84,7 +84,6 @@ class AssetType(BaseModel):
 
 class AssetDomain(BaseModel):
     """Типа"""
-
     name = models.CharField(
         primary_key=True
         , max_length=255
@@ -192,17 +191,42 @@ class Asset(BaseModel):
         verbose_name_plural = '040 Источники'  # Указываем имя таблицы в админке
 
 
+class AssetColumnType(BaseModel):
+    """Типы данных."""
+
+    data_type = models.CharField(
+        primary_key=True,
+        max_length=255,
+        verbose_name="Тип данных",
+        help_text="Тип данных в этом столбце.",
+    )
+
+    def __str__(self):
+        return f'{self.data_type}'
+
+    class Meta:
+        db_table = f'{db_schema}\".\"column_type'
+        verbose_name = '05 Типы столбцов'
+        verbose_name_plural = '05 Типы столбцов' 
+        ordering = ['data_type', ]
+        unique_together = (('data_type',),)
+
+
 class AssetColumn(BaseModel):
     """Описание столбца в таблице источника данных."""
-
+    number = models.PositiveIntegerField(
+        verbose_name="Номер по списку для ранжирования."
+        , db_comment='{"name":"Номер по списку для ранжирования.",}'
+        , help_text="Номер по списку для ранжирования.",
+    )
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name='columns')
     name = models.CharField(
         max_length=255,
         verbose_name="Имя столбца",
         help_text="Имя столбца в таблице.",
     )
-    data_type = models.CharField(
-        max_length=128,
+    data_type = models.ForeignKey(
+        AssetColumnType, on_delete=models.CASCADE,
         verbose_name="Тип данных",
         help_text="Тип данных в этом столбце.",
     )
@@ -224,7 +248,7 @@ class AssetColumn(BaseModel):
         db_table = f'{db_schema}\".\"asset_columns'
         verbose_name = '050 Столбец'
         verbose_name_plural = '050 Столбцы'
-        ordering = ['asset', 'name']
+        ordering = ['number', ]
         unique_together = (('asset', 'name'),)
 
 

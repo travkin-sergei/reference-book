@@ -1,31 +1,36 @@
-<li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle" href="#" role="button" id="navbarDropdown" data-bs-toggle="dropdown"
-       aria-expanded="false">
-        Геообъекты
+<ul class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle"
+       href="#"
+       role="button"
+       id="navbarDropdown"
+       data-bs-toggle="dropdown"
+       aria-expanded="false"
+       style="color: white;">
+        Geo объекты
     </a>
-    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+    <ul class="dropdown-menu" aria-labelledby="navbarDropdown" style="background-color: black;">
         <li>
-            <a class="dropdown-item" href="{% url 'my_geo_id:geo-list' %}">
+            <a class="dropdown-item" href="{% url 'my_geo_id:geo-list' %} " style="color: white;">
                 Список объектов
             </a>
         </li>
         <li>
-            <a class="dropdown-item" href="{% url 'my_geo_id:geo-mapp' %}">
+            <a class="dropdown-item" href="{% url 'my_geo_id:geo-mapp' %}" style="color: white;">
                 Группировки
             </a>
         </li>
         <li>
-            <a class="dropdown-item" href="{% url 'my_geo_id:geo-country-list' %}">
+            <a class="dropdown-item" href="{% url 'my_geo_id:geo-country-list' %}" style="color: white;">
                 Справочники
             </a>
         </li>
         <li>
-            <a class="dropdown-item" href="{% url 'my_geo_id:geo-id-search' %}">
+            <a class="dropdown-item" href="{% url 'my_geo_id:geo-id-search' %}" style="color: white;">
                 Поиск GEO-ID по синонимам
             </a>
         </li>
         <li>
-            <a class="dropdown-item" href="{% url 'my_geo_id:geo-map' %}">
+            <a class="dropdown-item" href="{% url 'my_geo_id:geo-map' %}" style="color: white;">
                 Карта
             </a>
         </li>
@@ -33,9 +38,11 @@
             <hr class="dropdown-divider">
         </li>
         <li>
-            <a class="dropdown-item" href="{% url 'my_geo_id:about-app' %}">
-                О разделе
-            </a>
+            <hr class="dropdown-divider" style="background-color: white;">
         </li>
+        <li><a class="dropdown-item" href="{% url 'my_geo_id:about-app' %}" style="color: white;">О разделе</a></li>
     </ul>
-</li>
+</ul>
+
+
+

@@ -5,7 +5,7 @@ from drf_spectacular.views import (
     SpectacularRedocView,
     SpectacularSwaggerView,
 )
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
 urlpatterns = [
     # Административная панель
@@ -17,11 +17,11 @@ urlpatterns = [
     path('api/v1/swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger'),
     path('api/v1/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     # Токены авторизации
-    path('api/v1/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/v1/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),  # Получение access и refresh токена
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),  # Обновление access токена
+    path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),  # Проверка валидности токена
     # Приложения
     path('auth/', include('my_auth.urls', namespace='my_auth')),
     path('asset/', include('my_data_asset.urls')),  # Приложение Источники данных
     path('', include('my_geo_id.urls')),  # Приложение GEO-ID
-
 ]

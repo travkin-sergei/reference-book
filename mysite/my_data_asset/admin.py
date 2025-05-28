@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (
     Asset, AssetType, AssetDomain, AssetDetails,
-    AssetColumn, AssetCategory, AssetCategoryRelation
+    AssetColumn, AssetCategory, AssetCategoryRelation, AssetColumnType
 )
 
 
@@ -18,7 +18,7 @@ class BaseAdmin(admin.ModelAdmin):
 class AssetColumnInline(admin.TabularInline):
     model = AssetColumn
     extra = 1
-    fields = 'name', 'data_type', 'description', 'is_nullable', 'is_active',
+    fields = 'number', 'name', 'data_type', 'description', 'is_nullable', 'is_active',
     verbose_name = "Столбец"
     verbose_name_plural = "Столбцы"
 
@@ -61,6 +61,14 @@ class AssetAdmin(BaseAdmin):
     search_fields = 'version', 'res_url', 'description', 'type__name', 'domain__name', 'details__name'
     list_filter = 'type', 'domain', 'details', 'is_active',
     autocomplete_fields = ['type', 'domain', 'details', ]
+
+
+@admin.register(AssetColumnType)
+class AssetColumnTypeAdmin(BaseAdmin):
+    """Типы данных."""
+
+    list_display = 'data_type',
+    search_fields = 'data_type',
 
 
 @admin.register(AssetColumn)
